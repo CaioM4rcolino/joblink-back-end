@@ -2,11 +2,15 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable("clients", {
-      id:{
-        primaryKey: true,
+    await queryInterface.createTable("users", {
+      id: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
         autoIncrement: true
+      },
+      is_freelancer:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false
       },
       name:{
         type: Sequelize.STRING,
@@ -40,10 +44,6 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
-      online:{
-        type: Sequelize.BOOLEAN,
-        allowNull: true
-      },
       created_at:{
         type: Sequelize.DATE,
         allowNull: false
@@ -56,7 +56,8 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('clients');
-     
+  
+    await queryInterface.dropTable('users');
+
   }
 };

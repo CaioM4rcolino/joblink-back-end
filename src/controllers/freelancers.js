@@ -1,4 +1,6 @@
-const Freelancer = require("../models/Freelancer");
+//antigo controller de freelancer
+//fazer a tratativa usando o atributo booleano
+const User = require("../models/User");
 const bcrypt = require('bcryptjs')
 const {generateToken} = require("../utils");
 
@@ -6,17 +8,26 @@ module.exports = {
 
     async index(req, res){
 
-       const freelancers = await Freelancer.findAll({
-           attributes: ["id", "name", "birth_date", "cpf", "email"]
-       });
+        try {
 
-       if(freelancers == null){
-           res.status(404).send("Nenhum freelancer encontrado.")
-       }
-       else{
-           res.status(200).send(freelancers)
-       }
+            const freelancers = await User.findAll({where: {is_freelancer: 1},
+            include:{
+                association: "Freelancer",
+                attributes: ["years_experience", "history", "rating"]
+                
+            }});
+    
+                if(freelancers == ""){
+                    res.status(404).send({Error: "Nenhum freelancer encontrado."})
+                }
+                else{
+                    res.status(200).send(freelancers)
+                }
 
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
     },
 
     async find(req, res){
@@ -26,12 +37,19 @@ module.exports = {
             const freelancerId = req.params;
 
 
-            const findFreelancerById = await Freelancer.findByPk(freelancerId, {
-                attributes: ["id", "name", "birth_date", "cpf", "email"]
+            const findFreelancerById = await User.findOne({where:{isFreelancer: 1, id: freelancerId},
+                attributes:["id",
+                 "name", 
+                 "birth_date", 
+                 "email", 
+                 "cpf", 
+                 "years_experience", 
+                 "history", 
+                 "image"]
             })
     
             if(findFreelancerById == null){
-                return res.status(404).send("Freelancer não encontrado.")
+                return res.status(404).send({Error: "Freelancer não encontrado."})
             }
             else{
                 return res.status(200).send(findFreelancerById);
@@ -53,11 +71,23 @@ module.exports = {
 
         try {
 
-            let verifyEmail = await Freelancer.findOne({where: {email: email}});
-            let verifyCpf = await Freelancer.findOne({where: {cpf: cpf}});
+            let verifyEmail = await User.findOne({where: {email: email}});
+            let verifyCpf = await User.findOne({where: {cpf: cpf}});
 
             if(verifyEmail == null || verifyCpf == null){
-                let freelancer = await Freelancer.create({name, email, password: encryptedPassword, birth_date, cpf, years_experience, history, rating: 0.0, banned: false, suspended: false});
+                let freelancer = await User.create({
+                    name, 
+                    email, 
+                    password: encryptedPassword, 
+                    birth_date, 
+                    cpf, 
+                    years_experience, 
+                    history, 
+                    rating: 0.0, 
+                    is_freelancer: 1,
+                    banned: false, 
+                    suspended: false
+                });
 
                 const token = generateToken({freelancerId: freelancer.id, freelancerName: freelancer.name});
                 res.status(201).send({
@@ -68,7 +98,7 @@ module.exports = {
                         freelancerEmail: freelancer.email,
                         freelancerCpf: freelancer.cpf,
                         freelancersYearsExperience: freelancer.years_experience,
-                        freeLancerHistory: freelancer.history,
+                        freelancerHistory: freelancer.history,
                         freelancerRating: freelancer.rating
                     },
 
@@ -77,7 +107,7 @@ module.exports = {
                 
             }
             else{
-                res.status(401).send("E-mail ou CPF já existentes.")
+                res.status(401).send({Error: "E-mail ou CPF já registrados."})
             }
             
         } catch (error) {
@@ -88,6 +118,53 @@ module.exports = {
     },
     
     async update(req, res){
+
+        const freelancerId = req.params.id;
+        const {name, email, password, birth_date, cpf, years_experience, history, rating} = req.body;
+
+
+        try {
+
+            const user = await User.findByPk(freelancerId);
+
+            if(password != undefined){
+
+                if(!bcrypt.compareSync(password, user.password)){
+
+                    user.password = encryptedPassword;
+                    user.save();
+
+                }
+                else{
+                    return res.status(400).send({Error: "Insira uma senha diferente da antiga."});
+                }
+
+            }
+
+            const updatedFreelancer = await user.update({
+                    name,
+                    email,
+                    birth_date,
+                    cpf,
+                    rating,
+                    years_experience,
+                    history,
+                    suspended,
+                    banned,
+                   
+                },
+                {
+                    where:{
+                        id: freelancerId
+                    }
+                });
+
+                res.status(200).send(updatedFreelancer)
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
 
     },
 

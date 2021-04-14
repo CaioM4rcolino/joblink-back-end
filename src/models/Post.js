@@ -1,14 +1,17 @@
 const { Model, DataTypes } = require("sequelize");
 
-class Freelancer extends Model{
+class Post extends Model{
     //aqui inicializamos nossos campos na tabela
     static init(sequelize){
         super.init(
             
             {
-            rating: DataTypes.FLOAT,
-            years_experience: DataTypes.STRING,
-            history: DataTypes.TEXT
+            
+            title: DataTypes.STRING,
+            description: DataTypes.TEXT,
+            image: DataTypes.STRING,
+            urgency: DataTypes.STRING,
+
            
             },
             {
@@ -18,8 +21,9 @@ class Freelancer extends Model{
         )
     }
     static associate(models){
-        this.belongsTo(models.User, {foreignKey: "id"})
+        this.sequelize
+      
     }
 }
 
-module.exports = Freelancer;
+module.exports = Post;
