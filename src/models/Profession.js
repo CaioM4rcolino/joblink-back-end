@@ -1,12 +1,12 @@
 const { Model, DataTypes } = require("sequelize");
 
-class Client extends Model{
+class Profession extends Model{
     //aqui inicializamos nossos campos na tabela
     static init(sequelize){
         super.init(
             
             {
-            
+            name: DataTypes.STRING
             },
             {
                 sequelize,
@@ -16,8 +16,10 @@ class Client extends Model{
     }
 
     static associate(models){
-        this.belongsTo(models.User, {foreignKey: "id"})
+        this.sequelize
+        this.belongsTo(models.User, {foreignKey: "user_id"});
+        
     }
 }
 
-module.exports = Client;
+module.exports = Profession;

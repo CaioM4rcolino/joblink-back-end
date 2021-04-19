@@ -169,7 +169,7 @@ module.exports = {
             let deleteClient = await User.destroy({where: {id: clientId}})
 
             if(!deleteClient){
-                res.status(400).send({Error: "Cliente não encontrado."})
+                res.status(404).send({Error: "Cliente não encontrado."})
             }
             else{
                 //Devolver a resposta com o status

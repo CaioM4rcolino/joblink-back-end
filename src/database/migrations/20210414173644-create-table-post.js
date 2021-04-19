@@ -25,21 +25,10 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: false
     },
-    client_id: {
+    user_id: {
       type: Sequelize.INTEGER,
       references:{
-        model: "clients", 
-        key: "id"
-      },
-      onUpdate: "CASCADE",
-      onDelete: "CASCADE",
-      allowNull:false
-
-    },
-    freelancer_id: {
-      type: Sequelize.INTEGER,
-      references:{
-        model: "freelancers", 
+        model: "users", 
         key: "id"
       },
       onUpdate: "CASCADE",

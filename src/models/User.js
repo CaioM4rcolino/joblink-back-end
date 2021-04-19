@@ -25,8 +25,11 @@ class User extends Model{
 
     static associate(models){
         this.sequelize
-        this.hasOne(models.Client)
+        this.hasOne(models.Client, {foreignKey: "id"})
         this.hasOne(models.Freelancer, {foreignKey: "id"})
+        this.hasMany(models.Post, {foreignKey: "user_id"});
+        this.hasMany(models.Profession, {foreignKey: "user_id"});
+
     }
 }
 

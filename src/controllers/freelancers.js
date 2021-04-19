@@ -11,11 +11,20 @@ module.exports = {
         try {
 
             const freelancers = await User.findAll({where: {is_freelancer: 1},
-            include:{
+
+            include:[
+                {
                 association: "Freelancer",
-                attributes: ["years_experience", "history", "rating"]
-                
-            }});
+                attributes: ["years_experience", "history", "rating"],
+                },
+                {
+                association: "Professions",
+                attributes: ["name"]
+                }
+            ],
+           
+
+        });
     
                 if(freelancers == ""){
                     res.status(404).send({Error: "Nenhum freelancer encontrado."})
@@ -66,7 +75,9 @@ module.exports = {
     
     async store(req, res){
 
-        const {name, email, password, birth_date, cpf, years_experience, history} = req.body;
+     
+
+        const {name, email, password, birth_date, cpf, profession, years_experience, history} = req.body;
         const encryptedPassword = bcrypt.hashSync(password)
 
         try {
@@ -75,6 +86,7 @@ module.exports = {
             let verifyCpf = await User.findOne({where: {cpf: cpf}});
 
             if(verifyEmail == null || verifyCpf == null){
+
                 let freelancer = await User.create({
                     name, 
                     email, 
@@ -88,22 +100,11 @@ module.exports = {
                     banned: false, 
                     suspended: false
                 });
+                
+                freelancer.addProfession(profession);
 
                 const token = generateToken({freelancerId: freelancer.id, freelancerName: freelancer.name});
-                res.status(201).send({
-                    freelancer:{
-                        freelancerName: freelancer.name,
-                        freelancerId: freelancer.id,
-                        freelancerBirthDate: freelancer.birth_date,
-                        freelancerEmail: freelancer.email,
-                        freelancerCpf: freelancer.cpf,
-                        freelancersYearsExperience: freelancer.years_experience,
-                        freelancerHistory: freelancer.history,
-                        freelancerRating: freelancer.rating
-                    },
-
-                    token
-                })
+                res.status(201).send(freelancer, token);
                 
             }
             else{
@@ -169,6 +170,25 @@ module.exports = {
     },
 
     async delete(req, res){
+
+        const freelancerId = req.params.id
+
+        try {
+
+            const deleteFreelancer = await User.destroy({where:{id: freelancerId}});
+
+            if(!deleteFreelancer){
+                res.status(404).send({Error: "Freelancer não encontrado."})
+            }
+            else{
+                res.status(200).send({Success: "Freelancer deletado com sucesso."})
+            }
+
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
 
     }
 

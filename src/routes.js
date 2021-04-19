@@ -6,6 +6,7 @@ const middlewareFreelancers = require('./middleware/freelancers')
 
 const controllerFreelancers = require('./controllers/freelancers');
 const controllerClients = require('./controllers/clients');
+const controllerPosts = require('./controllers/posts');
 
 const controllerSessions = require('./controllers/sessions')
 
@@ -23,6 +24,11 @@ routes.get("/freelancers", controllerFreelancers.index);
 routes.get("/freelancers/:id", controllerFreelancers.find)
 routes.post("/freelancers", middlewareFreelancers.create,controllerFreelancers.store);
 routes.put("/freelancers/:id", middlewareFreelancers.update, controllerFreelancers.update);
-routes.delete("/freelancers/:id");
+routes.delete("/freelancers/:id", controllerFreelancers.delete);
+
+routes.get("/posts", controllerPosts.index);
+routes.post("/posts/:id", controllerPosts.store);
+// routes.put();
+// routes.delete();
 
 module.exports = routes;
