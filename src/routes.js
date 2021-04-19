@@ -3,6 +3,10 @@ const routes = express.Router();
 
 const middlewareClients = require('./middleware/clients');
 const middlewareFreelancers = require('./middleware/freelancers')
+const middlewarePosts = require('./middleware/posts')
+
+const uploadFirebase = require('./services/uploadFirebase');
+const multerValidator = require('./middleware/multerValidator');
 
 const controllerFreelancers = require('./controllers/freelancers');
 const controllerClients = require('./controllers/clients');
@@ -27,8 +31,8 @@ routes.put("/freelancers/:id", middlewareFreelancers.update, controllerFreelance
 routes.delete("/freelancers/:id", controllerFreelancers.delete);
 
 routes.get("/posts", controllerPosts.index);
-routes.post("/posts/:id", controllerPosts.store);
-// routes.put();
-// routes.delete();
+routes.post("/posts/:id", multerValidator, uploadFirebase, middlewarePosts.create, controllerPosts.store);
+routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
+routes.delete("/posts/:id", controllerPosts.delete);
 
 module.exports = routes;

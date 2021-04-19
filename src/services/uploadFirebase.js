@@ -1,58 +1,57 @@
 
-// var admin = require("firebase-admin");
+var admin = require("firebase-admin");
 
-// var serviceAccount = require("../config/firebase-key");
+var serviceAccount = require("../config/firebase-key");
 
-// const bucketAdress = "senaioverflowstorage.appspot.com";
+const bucketAdress = "joblinkproject.appspot.com";
 
-// admin.initializeApp({
-//     credential: admin.credential.cert(serviceAccount),
-//     storageBucket: bucketAdress,
-// });
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: bucketAdress,
+});
 
-// const bucket = admin.storage().bucket();
+const bucket = admin.storage().bucket();
 
+const uploadImagem = (req, res, next) => {
 
-// const uploadImagem = (req, res, next) => {
+    if (!req.file) {
+        return next();
+    }
 
-//     if (!req.file) {
-//         return next();
-//     }
+    const image = req.file;
 
-//     const image = req.file;
+    const fileName = Date.now() + "." + image.originalname.split(".").pop();
 
-//     const fileName = Date.now() + "." + image.originalname.split(".").pop();
+    const file = bucket.file("imagens/" + fileName);
 
-//     const file = bucket.file(fileName);
+    const stream = file.createWriteStream({
 
-//     const stream = file.createWriteStream({
+        metadata: {
+            contentType: image.mimetype,
+        },
 
-//         metadata: {
-//             contentType: image.mimetype,
-//         },
+    });
 
-//     });
+    stream.on("error", (e) => {
+        console.error(e)
+    });
 
-//     stream.on("error", (e) => {
-//         console.error(e)
-//     });
+    stream.on("finish", async () => {
 
-//     stream.on("finish", async () => {
+        await file.makePublic();
 
-//         await file.makePublic();
+        req.file.fileName = fileName;
 
-//         req.file.fileName = fileName;
+        req.file.firebaseUrl = `https://storage.googleapis.com/${bucketAdress}/imagens/${fileName}`;
 
-//         req.file.firebaseUrl = `https://storage.googleapis.com/${bucketAdress}/${fileName}`;
+        console.log("aqui-----",req.file)
 
-//         console.log("aqui-----",req.file)
+        next();
 
-//         next();
+    });
 
-//     });
+    stream.end(image.buffer)
 
-//     stream.end(image.buffer)
+}
 
-// }
-
-// module.exports = uploadImagem;
+module.exports = uploadImagem;
