@@ -28,7 +28,7 @@ class User extends Model{
         this.hasOne(models.Client, {foreignKey: "id"})
         this.hasOne(models.Freelancer, {foreignKey: "id"})
         this.hasMany(models.Post, {foreignKey: "user_id"});
-        this.hasMany(models.Profession, {foreignKey: "user_id"});
+        this.belongsToMany(models.Profession, {through: "user-profession"});
 
     }
 }

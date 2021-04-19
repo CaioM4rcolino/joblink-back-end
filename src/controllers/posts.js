@@ -7,7 +7,12 @@ module.exports = {
 
         try {
             
-            const posts = await Post.findAll();
+            const posts = await Post.findAll({
+                include:{
+                    association: "User",
+                    attributes: ["name"]
+                }
+            });
 
             res.status(200).send(posts)
 

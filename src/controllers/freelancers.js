@@ -8,6 +8,13 @@ module.exports = {
 
     async index(req, res){
 
+        for (let assoc of Object.keys(User.associations)) {
+            for (let accessor of Object.keys(User.associations[assoc].accessors)) {
+                console.log(User.name + '.' + User.associations[assoc].accessors[accessor] + '()');
+            }
+        }
+
+
         try {
 
             const freelancers = await User.findAll({where: {is_freelancer: 1},
@@ -19,6 +26,7 @@ module.exports = {
                 },
                 {
                 association: "Professions",
+                through: {attributes: [] },
                 attributes: ["name"]
                 }
             ],
@@ -101,10 +109,10 @@ module.exports = {
                     suspended: false
                 });
                 
-                freelancer.addProfession(profession);
+                freelancer.addProfessions(profession);
 
                 const token = generateToken({freelancerId: freelancer.id, freelancerName: freelancer.name});
-                res.status(201).send(freelancer, token);
+                res.status(201).send({freelancer, token});
                 
             }
             else{
@@ -121,13 +129,25 @@ module.exports = {
     async update(req, res){
 
         const freelancerId = req.params.id;
-        const {name, email, password, birth_date, cpf, years_experience, history, rating} = req.body;
+        const {
+            name, 
+            email, 
+            password, 
+            birth_date, 
+            cpf, 
+            years_experience, 
+            history, 
+            rating, 
+            suspended, 
+            banned, 
+            profession
+        } = req.body;
 
 
         try {
 
             const user = await User.findByPk(freelancerId);
-
+            
             if(password != undefined){
 
                 if(!bcrypt.compareSync(password, user.password)){
@@ -142,7 +162,7 @@ module.exports = {
 
             }
 
-            const updatedFreelancer = await user.update({
+            const updateFreelancer = await user.update({
                     name,
                     email,
                     birth_date,
@@ -160,7 +180,10 @@ module.exports = {
                     }
                 });
 
-                res.status(200).send(updatedFreelancer)
+            if(profession != undefined || profession != null)
+                user.setProfessions(profession)
+
+            res.status(200).send(updateFreelancer)
             
         } catch (error) {
             console.log(error)
