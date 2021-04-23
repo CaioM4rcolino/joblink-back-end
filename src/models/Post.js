@@ -23,6 +23,8 @@ class Post extends Model{
     static associate(models){
         this.sequelize
         this.belongsTo(models.User, {foreignKey: "user_id"})
+        this.belongsToMany(models.Category, {through: "post-category"});
+
     }
 }
 
