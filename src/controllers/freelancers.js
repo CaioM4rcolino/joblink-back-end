@@ -84,8 +84,8 @@ module.exports = {
     async store(req, res){
 
      
-
-        const {name, email, password, birth_date, cpf, profession, years_experience, history} = req.body;
+        const {firebaseUrl} = req.file ? req.file : " ";
+        const {name, email, gender, password, birth_date, cpf, profession, years_experience, history} = req.body;
         const encryptedPassword = bcrypt.hashSync(password)
 
         try {
@@ -98,6 +98,8 @@ module.exports = {
                 let freelancer = await User.create({
                     name, 
                     email, 
+                    gender,
+                    image: firebaseUrl,
                     password: encryptedPassword, 
                     birth_date, 
                     cpf, 
@@ -106,9 +108,14 @@ module.exports = {
                     rating: 0.0, 
                     is_freelancer: 1,
                     banned: false, 
-                    suspended: false
+                    suspended: false,
+                    agreed_policy: true
                 });
-                
+
+                if(freelancer.agreed_policy == false){
+                    return res.status(401).send({Unauthorized: "Você deve aceitar os termos de condições para acessar o sistema."});
+                }
+
                 freelancer.addProfessions(profession);
 
                 const token = generateToken({freelancerId: freelancer.id, freelancerName: freelancer.name});
@@ -132,6 +139,7 @@ module.exports = {
         const {
             name, 
             email, 
+            gender,
             password, 
             birth_date, 
             cpf, 
@@ -147,6 +155,11 @@ module.exports = {
         try {
 
             const user = await User.findByPk(freelancerId);
+
+            
+            if(user == null || user == undefined){
+                return res.status(404).send({Error: "Usuário não encontrado"})
+            }
             
             if(password != undefined){
 
@@ -165,6 +178,7 @@ module.exports = {
             const updateFreelancer = await user.update({
                     name,
                     email,
+                    gender,
                     birth_date,
                     cpf,
                     rating,

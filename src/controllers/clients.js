@@ -8,7 +8,6 @@ module.exports = {
 
     async index(req, res){
 
-
         try {
             
             const clients = await User.findAll({where:{is_freelancer: 0},
@@ -64,8 +63,8 @@ module.exports = {
         //     }
         // }
 
-
-        const {name, email, password, birth_date, cpf} = req.body;
+        const {firebaseUrl} = req.file ? req.file : " ";
+        const {name, email, gender, password, birth_date, cpf} = req.body;
         const encryptedPassword = bcrypt.hashSync(password)
 
 
@@ -75,28 +74,26 @@ module.exports = {
             let verifyCpf = await User.findOne({where: {cpf: cpf}});
             
             if(verifyEmail == null && verifyCpf == null){
-                let client = await User.create({name, 
+                let client = await User.create({
+                    name, 
                     email, 
+                    gender,
                     password: encryptedPassword, 
                     birth_date, 
                     cpf, 
+                    image: firebaseUrl,
                     banned: false, 
                     suspended: false,
-                    is_freelancer: false
+                    is_freelancer: false,
+                    agreed_policy: true
                 });
 
-                const token = generateToken({clientId: client.id,clientName:client.name});
-                res.status(201).send({
-                    client:{
-                        clientId: client.id,
-                        clientName: client.name,
-                        clientBirthDate: client.birth_date,
-                        clientEmail: client.email,
-                        clientCpf: client.cpf
-                        },
+                if(client.agreed_policy == false){
+                    return res.status(401).send({Unauthorized: "Você deve aceitar os termos de condições para acessar o sistema."});
+                }
 
-                    token
-                })
+                const token = generateToken({clientId: client.id,clientName:client.name});
+                res.status(201).send({client, token})
             }
             else{
                 res.status(401).send({Error: "E-mail ou CPF já registrados."})
@@ -116,12 +113,16 @@ module.exports = {
     async update(req, res){
 
         const clientId = req.params.id;
-        const {name, email, password, birth_date, cpf, suspended, banned} = req.body;
+        const {name, email, gender, password, birth_date, cpf, suspended, banned} = req.body;
 
 
         try {
 
             const user = await User.findByPk(clientId);
+
+            if(user == null || user == undefined){
+                return res.status(404).send({Error: "Usuário não encontrado"})
+            }
 
             if(password != undefined){
 
@@ -140,6 +141,7 @@ module.exports = {
             const updatedClient = await user.update({
                     name,
                     email,
+                    gender,
                     birth_date,
                     cpf,
                     suspended,

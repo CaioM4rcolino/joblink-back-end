@@ -2,6 +2,7 @@
 var admin = require("firebase-admin");
 
 var serviceAccount = require("../config/firebase-key");
+const { route } = require("../routes");
 
 const bucketAdress = "joblinkproject.appspot.com";
 
@@ -22,7 +23,24 @@ const uploadImagem = (req, res, next) => {
 
     const fileName = Date.now() + "." + image.originalname.split(".").pop();
 
-    const file = bucket.file("imagens/" + fileName);
+    let file;
+    let filePath;
+    switch(req.route.path){
+        case "/posts/:id":
+            filePath = "post-images/";
+            file = bucket.file(filePath + fileName);
+            break;
+
+        case "/clients":
+            filePath = "clients-profile-pictures/";
+            file = bucket.file(filePath + fileName);
+            break;
+
+        case "/freelancers":
+            filePath = "freelancers-profile-pictures/";
+            file = bucket.file(filePath + fileName);
+            break;
+    }
 
     const stream = file.createWriteStream({
 
@@ -42,7 +60,7 @@ const uploadImagem = (req, res, next) => {
 
         req.file.fileName = fileName;
 
-        req.file.firebaseUrl = `https://storage.googleapis.com/${bucketAdress}/imagens/${fileName}`;
+        req.file.firebaseUrl = `https://storage.googleapis.com/${bucketAdress}/${filePath}${fileName}`;
 
         console.log("aqui-----",req.file)
 

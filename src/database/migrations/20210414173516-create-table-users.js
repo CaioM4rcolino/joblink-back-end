@@ -12,9 +12,17 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false
       },
+      agreed_policy:{
+        type: Sequelize.BOOLEAN,
+        allowNull: false
+      },
       name:{
         type: Sequelize.STRING,
         allowNull: false
+      },
+      gender: {
+        type: Sequelize.STRING,
+        allowNull:false
       },
       birth_date:{
         type: Sequelize.STRING,
