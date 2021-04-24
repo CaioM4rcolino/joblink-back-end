@@ -25,6 +25,7 @@ const uploadImagem = (req, res, next) => {
 
     let file;
     let filePath;
+    
     switch(req.route.path){
         case "/posts/:id":
             filePath = "post-images/";

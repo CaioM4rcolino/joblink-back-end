@@ -8,10 +8,18 @@ module.exports = {
         try {
             
             const posts = await Post.findAll({
-                include:{
+                include:[
+                
+                    {
                     association: "User",
                     attributes: ["name"]
-                }
+                    },
+                    {
+                    association: "Categories",
+                    through: {attributes: [] },
+                    attributes: ["name"]
+                    }
+            ]
             });
 
             res.status(200).send(posts)
@@ -36,9 +44,17 @@ module.exports = {
 
     async store(req, res){
 
+        //  for (let assoc of Object.keys(User.associations)) {
+        //     for (let accessor of Object.keys(User.associations[assoc].accessors)) {
+        //         console.log(User.name + '.' + User.associations[assoc].accessors[accessor] + '()');
+        //     }
+        // }
+
+
+
         const {firebaseUrl} = req.file ? req.file : " ";
 
-        const {title, description, urgency} = req.body;
+        const {title, description, urgency, category} = req.body;
         const authorId = req.params.id;
 
         try {
@@ -52,6 +68,8 @@ module.exports = {
                 image: firebaseUrl,
                 user_id: authorId
             })
+
+            post.addCategories(category)
 
             res.status(201).send({
                 Status: "Success",

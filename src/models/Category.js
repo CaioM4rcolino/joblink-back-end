@@ -17,7 +17,7 @@ class Category extends Model{
 
     static associate(models){
         this.sequelize
-        this.belongsToMany(models.Post, {foreignKey: "post_id"})
+        this.belongsTo(models.Post, {foreignKey: "post_id"})
         this.belongsToMany(models.Post, {through: "post-category"})
 
     }
