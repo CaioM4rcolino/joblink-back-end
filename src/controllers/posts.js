@@ -54,19 +54,30 @@ module.exports = {
 
         const {firebaseUrl} = req.file ? req.file : " ";
 
-        const {title, description, urgency, category} = req.body;
+        const {title, description, urgency, category, attendance, is_announcement} = req.body;
         const authorId = req.params.id;
 
         try {
 
             const author = await User.findByPk(authorId);
+            
+            let isFromClient;
+            if(author.isFreelancer == 0 || author.isFreelancer == false){
+                isFromClient = true;
+            }
+            else{
+                isFromClient = false;
+            }
 
             let post = await Post.create({
                 title,
                 description,
                 urgency,
                 image: firebaseUrl,
-                user_id: authorId
+                user_id: authorId,
+                attendance,
+                isFromClient,
+                is_announcement
             })
 
             post.addCategories(category)

@@ -9,6 +9,7 @@ module.exports = {
             description: Joi.string().min(10).max(1000).required(),
             urgency: Joi.string().length(1).required(),
             attendance: Joi.string().min(6).max(11).required(),
+            is_announcement: Joi.boolean().required(),
             category: Joi.string().required()
         })
     }),
@@ -19,6 +20,7 @@ module.exports = {
             description: Joi.string(),
             urgency: Joi.string().length(1),
             attendance: Joi.string().min(6).max(11),
+            is_announcement: Joi.boolean(),
             category: Joi.string()
         })
     })

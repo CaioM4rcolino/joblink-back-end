@@ -13,6 +13,7 @@ const controllerPosts = require('./controllers/posts');
 const controllerSessions = require('./controllers/sessions')
 const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
+const controllerServices = require('./controllers/services');
 
 //rota pública de login (session)
 routes.post("/sessions", controllerSessions.store);
@@ -44,6 +45,9 @@ routes.post("/posts/:id", multerValidator, middlewarePosts.create, uploadFirebas
 routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
 routes.delete("/posts/:id", controllerPosts.delete);
 
+//rota de requisições de serviços
+routes.post("/services/toFreelancer/:idPost/:idFreelancer", controllerServices.store);
+routes.post("/services/toClient/:idFreelancer/:idPost", controllerServices.store);
 
 
 module.exports = routes;
