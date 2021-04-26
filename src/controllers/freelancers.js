@@ -103,14 +103,17 @@ module.exports = {
                     password: encryptedPassword, 
                     birth_date, 
                     cpf, 
-                    years_experience, 
-                    history, 
-                    rating: 0.0, 
                     is_freelancer: 1,
                     banned: false, 
                     suspended: false,
                     agreed_policy: true
                 });
+
+                freelancer.createFreelancer({
+                    years_experience, 
+                    history, 
+                    rating: 0.0, 
+                })
 
                 if(freelancer.agreed_policy == false){
                     return res.status(401).send({Unauthorized: "Você deve aceitar os termos de condições para acessar o sistema."});

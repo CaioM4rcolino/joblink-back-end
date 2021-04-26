@@ -13,17 +13,20 @@ module.exports = {
                     },
 
                     {
-                        attributes: "Categories",
+                        association: "Categories",
+                        through: {attributes: []},
+                        attributes: ["name"]
 
                     }
 
-
-
                 ]
             })
+
+            res.status(200).send(feed);
             
         } catch (error) {
-            
+            console.log(error)
+            res.status(500).send(error)
         }
     }
 }

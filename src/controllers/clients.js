@@ -8,6 +8,12 @@ module.exports = {
 
     async index(req, res){
 
+        for (let assoc of Object.keys(User.associations)) {
+            for (let accessor of Object.keys(User.associations[assoc].accessors)) {
+                console.log(User.name + '.' + User.associations[assoc].accessors[accessor] + '()');
+            }
+        }
+
         try {
             
             const clients = await User.findAll({where:{is_freelancer: 0},
@@ -87,6 +93,8 @@ module.exports = {
                     is_freelancer: false,
                     agreed_policy: true
                 });
+
+                client.createClient();
 
                 if(client.agreed_policy == false){
                     return res.status(401).send({Unauthorized: "Você deve aceitar os termos de condições para acessar o sistema."});
