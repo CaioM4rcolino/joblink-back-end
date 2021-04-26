@@ -29,6 +29,10 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: false
     },
+    is_announcement:{
+      type: Sequelize.BOOLEAN,
+      allowNull: false
+    },
     user_id: {
       type: Sequelize.INTEGER,
       references:{

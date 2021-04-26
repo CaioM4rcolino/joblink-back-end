@@ -7,6 +7,7 @@ const Freelancer = require("../models/Freelancer");
 const Post = require("../models/Post");
 const Profession = require('../models/Profession');
 const Category = require("../models/Category");
+const Service = require("../models/Service");
 
 const connection = new Sequelize(dbConfig);
 
@@ -15,7 +16,8 @@ Client.init(connection);
 Freelancer.init(connection);
 Post.init(connection);
 Profession.init(connection);
-Category.init(connection)
+Category.init(connection);
+Service.init(connection);
 
 User.associate(connection.models)
 Client.associate(connection.models);
@@ -23,3 +25,4 @@ Freelancer.associate(connection.models);
 Post.associate(connection.models)
 Profession.associate(connection.models);
 Category.associate(connection.models)
+Service.associate(connection.models);

@@ -1,0 +1,30 @@
+const { Model, DataTypes } = require("sequelize");
+
+class Service extends Model{
+    //aqui inicializamos nossos campos na tabela
+    static init(sequelize){
+        super.init(
+            
+            {
+            progress: DataTypes.STRING,
+            isFromClient: DataTypes.TINYINT,
+            service_cost: DataTypes.STRING,
+            rating: DataTypes.STRING,
+
+            },
+            {
+                sequelize,
+            }
+        
+        )
+    }
+
+    static associate(models){
+        this.sequelize
+        this.belongsTo(models.User, {foreignKey: "id_freelancer"});
+        this.belongsTo(models.Post, {foreignKey: "id_post"});
+
+    }
+}
+
+module.exports = Service;
