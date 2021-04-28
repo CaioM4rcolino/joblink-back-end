@@ -60,6 +60,10 @@ module.exports = {
         try {
 
             const author = await User.findByPk(authorId);
+
+            if(author == undefined || author == null){
+                res.status(404).send({Error: "Usuário não encontrado."})
+            }
             
             let isFromClient;
             if(author.isFreelancer == 0 || author.isFreelancer == false){

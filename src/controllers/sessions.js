@@ -31,10 +31,7 @@ module.exports = {
             .status(403)
             .send({ error: "Usuário e/ou senha inválidos" });
         } else {
-          token = generateToken({
-            freelancerId: freelancer.id,
-            freelancerName: freelancer.name,
-          });
+          token = generateToken({freelancerId: freelancer.id, freelancerName: freelancer.name});
 
           res.status(201).send({
             freelancer: {
