@@ -38,6 +38,7 @@ module.exports = {
 
           res.status(201).send({
             freelancer: {
+              id: freelancer.id,
               name: freelancer.name,
               email: freelancer.email,
               birth_date: freelancer.birth_date,
@@ -55,6 +56,7 @@ module.exports = {
 
         res.status(201).send({
           client: {
+            id: client.id,
             name: client.name,
             email: client.email,
             birth_date: client.birth_date,

@@ -26,6 +26,7 @@ class Post extends Model{
         this.sequelize
         this.belongsTo(models.User, {foreignKey: "user_id"})
         this.belongsToMany(models.Category, {through: "post-category"});
+        this.hasOne(models.Service, {foreignKey: "id_post"});
 
     }
 }

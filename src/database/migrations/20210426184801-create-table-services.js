@@ -3,14 +3,14 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
   
-     await queryInterface.createTable('service', { 
+     await queryInterface.createTable('services', { 
 
         id:{
           primaryKey: true,
           autoIncrement: true,
           type: Sequelize.INTEGER
         },
-        isFromClient:{
+        is_from_client:{
           type: Sequelize.BOOLEAN,
           allowNull: false
         },
@@ -26,7 +26,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true
         },
-        id_freelancer:{
+        id_user:{
             type: Sequelize.INTEGER,
             references:{
               model: "users", 

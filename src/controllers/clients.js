@@ -16,9 +16,7 @@ module.exports = {
 
         try {
             
-            const clients = await User.findAll({where:{is_freelancer: 0},
-                attributes:["id", "name", "birth_date", "email", "cpf", "image", "suspended", "banned"]
-            });
+            const clients = await User.findAll({where:{is_freelancer: 0}});
 
             if(clients == ""){
                 res.status(404).send({Error: "Nenhum cliente encontrado."})

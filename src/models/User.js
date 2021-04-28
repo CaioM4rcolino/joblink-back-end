@@ -29,8 +29,9 @@ class User extends Model{
         this.sequelize
         this.hasOne(models.Client, {foreignKey: "id"})
         this.hasOne(models.Freelancer, {foreignKey: "id"})
-        this.hasMany(models.Post, {foreignKey: "user_id"});
-        this.belongsToMany(models.Profession, {through: "user-profession"});
+        this.hasOne(models.Service, {foreignKey: "id_user"})
+        this.hasMany(models.Post, {foreignKey: "user_id"})
+        this.belongsToMany(models.Profession, {through: "user-profession"})
 
     }
 }

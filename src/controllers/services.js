@@ -18,23 +18,24 @@ module.exports = {
     },
     async store(req, res){
 
-        const idFreelancer = req.params.idFreelancer;
         const idPost = req.params.idPost;
 
-        return console.log(req.routes);
 
         try {
 
-            let isFromClient;
-            
-
+          
             const service = await Service.create({
                 id_freelancer: idFreelancer,
-                id_post: idPost
+                id_post: idPost,
+                is_from_client: isFromClient,
+                progress: 1,
             })
+
+            res.status(201).send(service);
             
         } catch (error) {
-            
+            console.log(error)
+            res.status(500).send(error)
         }
     },
     async update(req, res){

@@ -7,7 +7,7 @@ class Service extends Model{
             
             {
             progress: DataTypes.STRING,
-            isFromClient: DataTypes.TINYINT,
+            is_from_client: DataTypes.TINYINT,
             service_cost: DataTypes.STRING,
             rating: DataTypes.STRING,
 

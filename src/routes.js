@@ -45,9 +45,7 @@ routes.post("/posts/:id", multerValidator, middlewarePosts.create, uploadFirebas
 routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
 routes.delete("/posts/:id", controllerPosts.delete);
 
-//rota de requisições de serviços
-routes.post("/services/toFreelancer/:idPost/:idFreelancer", controllerServices.store);
-routes.post("/services/toClient/:idFreelancer/:idPost", controllerServices.store);
-
+//rota de serviços
+routes.post("/posts/:idPost/service", controllerServices.store);
 
 module.exports = routes;

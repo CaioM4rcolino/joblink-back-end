@@ -101,7 +101,7 @@ module.exports = {
     
     async update(req, res){
 
-        const {title, description, urgency, image} = req.body;
+        const {title, description, urgency, image, is_announcement} = req.body;
 
         const idPost = req.params.id;
 
@@ -113,7 +113,8 @@ module.exports = {
                 title,
                 description,
                 urgency,
-                image
+                image,
+                is_announcement
             })
 
             res.status(200).send(updatePost)
