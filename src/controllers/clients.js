@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require('bcryptjs')
 const {generateToken} = require("../utils");
+const auth = require("../config/auth");
+const jwt = require("jsonwebtoken");
 
 
 
@@ -8,11 +10,11 @@ module.exports = {
 
     async index(req, res){
 
-        for (let assoc of Object.keys(User.associations)) {
-            for (let accessor of Object.keys(User.associations[assoc].accessors)) {
-                console.log(User.name + '.' + User.associations[assoc].accessors[accessor] + '()');
-            }
-        }
+        // for (let assoc of Object.keys(User.associations)) {
+        //     for (let accessor of Object.keys(User.associations[assoc].accessors)) {
+        //         console.log(User.name + '.' + User.associations[assoc].accessors[accessor] + '()');
+        //     }
+        // }
 
         try {
             
@@ -118,48 +120,73 @@ module.exports = {
     
     async update(req, res){
 
-        const clientId = req.params.id;
-        const {name, email, gender, password, birth_date, cpf, suspended, banned} = req.body;
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
 
+        const {
+            name, 
+            email, 
+            gender, 
+            password, 
+            birth_date, 
+            cpf, 
+            suspended, 
+            banned
+        } = req.body;
+
+
+        let idClient;
 
         try {
 
-            const user = await User.findByPk(clientId);
+            if(payload.clientId != undefined || payload.clientId != null){
 
-            if(user == null || user == undefined){
-                return res.status(404).send({Error: "Usuário não encontrado"})
-            }
+                idClient = payload.clientId;
+                const user = await User.findByPk(idClient);
 
-            if(password != undefined){
-
-                if(!bcrypt.compareSync(password, user.password)){
-
-                    user.password = encryptedPassword;
-                    user.save();
-
-                }
-                else{
-                    return res.status(400).send({Error: "Insira uma senha diferente da antiga."});
+                if(user == undefined || user == null || user == ""){
+                    return res.status(404).send({Error: "Cliente não encontrado."})
                 }
 
-            }
+                if(password != undefined){
 
-            const updatedClient = await user.update({
-                    name,
-                    email,
-                    gender,
-                    birth_date,
-                    cpf,
-                    suspended,
-                    banned
-                },
-                {
-                    where:{
-                        id: clientId
+                    const encryptedPassword = bcrypt.hashSync(password)
+
+                    if(!bcrypt.compareSync(password, user.password)){
+
+                        user.password = encryptedPassword;
+                        user.save();
+
                     }
-                });
+                    else{
+                        return res.status(400).send({Error: "Insira uma senha diferente da antiga."});
+                    }
 
-                res.status(200).send(updatedClient)
+                }
+
+                const updatedClient = await user.update({
+                        name,
+                        email,
+                        gender,
+                        birth_date,
+                        cpf,
+                        suspended,
+                        banned
+                    },
+                    {
+                        where:{
+                            id: idClient
+                        }
+                    });
+
+                    res.status(200).send(updatedClient)
+
+            }
+            else{
+                return res.status(401).send({Error: "Token não autorizado."})
+            }
+
             
         } catch (error) {
             console.log(error)
@@ -170,19 +197,32 @@ module.exports = {
 
     async delete(req, res){
 
-        const clientId = req.params.id;
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
+        let idClient;
 
         try {
 
-            let deleteClient = await User.destroy({where: {id: clientId}})
+            if(payload.clientId != undefined || payload.clientId != null){
 
-            if(!deleteClient){
-                res.status(404).send({Error: "Cliente não encontrado."})
+                idClient = payload.clientId;
+
+                let deleteClient = await User.destroy({where: {id: idClient}})
+
+                if(!deleteClient){
+                    res.status(404).send({Error: "Cliente não encontrado."})
+                }
+                else{
+                    //Devolver a resposta com o status
+                    res.status(200).send({Sucess: 'Cliente deletado com sucesso.'});
+                }
             }
             else{
-                //Devolver a resposta com o status
-                res.status(200).send({Sucesso: 'Cliente deletado com sucesso.'});
-           }
+                return res.status(401).send({Error: "Token não autorizado."})
+            }
+
+            
             
         } catch (error) {
             console.log(error);

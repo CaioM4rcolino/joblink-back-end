@@ -34,23 +34,35 @@ routes.get("/feed", controllerFeed.index);
 //rota de clientes
 routes.get("/clients", controllerClients.index);
 routes.get("/clients/:id", controllerClients.find)
-routes.put("/clients/:id", middlewareClients.update, controllerClients.update);
-routes.delete("/clients/:id", controllerClients.delete);
+routes.put("/clients", middlewareClients.update, controllerClients.update);
+routes.delete("/clients", controllerClients.delete);
 
 //rota de freelancers
 routes.get("/freelancers", controllerFreelancers.index);
 routes.get("/freelancers/:id", controllerFreelancers.find)
-routes.put("/freelancers/:id", middlewareFreelancers.update, controllerFreelancers.update);
-routes.delete("/freelancers/:id", controllerFreelancers.delete);
+routes.put("/freelancers", middlewareFreelancers.update, controllerFreelancers.update);
+routes.delete("/freelancers", controllerFreelancers.delete);
 
 
 //rota de postagem
 routes.get("/posts", controllerPosts.index);
-routes.post("/posts/:id", multerValidator, middlewarePosts.create, uploadFirebase, controllerPosts.store);
+routes.post("/posts", multerValidator, middlewarePosts.create, uploadFirebase, controllerPosts.store);
 routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
 routes.delete("/posts/:id", controllerPosts.delete);
 
 //rota de serviços
+/*
+    possibilidades: cliente vê postagem de anuncio e chama freelancer
+                    freelancer vê postagem de pedido e chama cliente
+
+            *exclui a possibilidade de cliente chamando freelancer via card
+*/
 routes.post("/posts/:idPost/service", controllerServices.store);
+routes.delete("/posts/:idPost/service", controllerServices.delete);
+
+//rota de serviços
+/* 
+    possibilidade: somente se cliente faz postagem de pedido e seleciona um freelancer via card
+*/
 
 module.exports = routes;

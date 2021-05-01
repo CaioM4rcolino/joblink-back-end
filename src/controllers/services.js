@@ -22,44 +22,97 @@ module.exports = {
     },
     async store(req, res){
 
-        const idPost = req.params.idPost;
         const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
 
+        const idPost = req.params.idPost;
+        let idUser;
 
         try {
 
             const post = await Post.findByPk(idPost);
 
-            const [Bearer, token] = authorization.split(" ");
-
-            const payload = jwt.verify(token, auth.secret);
-
-            return console.log(payload);
-
-            if(post.is_announcement == false){
-
-                /*significa que há duas possibilidades:
-
-                    1. um trabalhador achou a postagem de um cliente e entrou em contato
-                        -nesse caso o id do payload é de um trabalhador
-                    2. um cliente fez uma postagem e encontrou um trabalhador, e entrou em contato com ele
-                        -nesse caso o id do payload é de um cliente
-
-                */
+            if(post == null || post == undefined || post == ""){
+                return res.status(404).send({Error: "Postagem não encontrada."})
             }
-            else{
+
+            if(payload.clientId != undefined || payload.clientId != null){
+                //significa que o token é de um cliente
+
+                idUser = payload.clientId;
+
+                if(post.is_announcement == true || post.is_announcement == 1){
+                    //significa que há um freelancer anunciando serviço
+
+                    const queryServices = await Service.findAll({where:{
+                        id_post: idPost,
+                        id_user: idUser
+                    }})
+
+                    if(queryServices != undefined || queryServices != null){
+                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
+                    }
+
+                    const service = await Service.create({
+                        id_user: idUser,
+                        id_post: idPost,
+                        is_from_client: true,
+                        progress: 1,
+                    })
+
+                    return res.status(201).send(service);
+    
+                }
+                else{
+                    return res.status(401).send({Unauthorized: "Você não pode prestar serviços."});
+                }
 
             }
-          
-            const service = await Service.create({
-                id_freelancer: idFreelancer,
-                id_post: idPost,
-                is_from_client: isFromClient,
-                progress: 1,
-            })
+            else if(payload.freelancerId != undefined || payload.freelancerId != null){
+                //significa que o token de um freelancer
 
-            res.status(201).send(service);
-            
+                idUser = payload.freelancerId;
+
+                if(post.is_announcement == false || post.is_announcement == 0){
+                    //significa que há um cliente pedindo serviços
+
+                    const queryServices = await Service.findAll({where:{
+                        id_post: idPost,
+                        id_user: idUser
+                    }})
+
+                    if(queryServices != undefined || queryServices != null){
+                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
+                    }
+
+                    const service = await Service.create({
+                        id_user: idUser,
+                        id_post: idPost,
+                        is_from_client: false,
+                        progress: 1,
+                    })
+
+                    return res.status(201).send(service);
+    
+                }
+                else{
+
+                    //freelancer atuando como cliente
+
+                    const service = await Service.create({
+                        id_user: idUser,
+                        id_post: idPost,
+                        is_from_client: true,
+                        progress: 1,
+                    })
+
+                    return res.status(201).send(service);
+
+                }
+
+            }
+  
         } catch (error) {
             console.log(error)
             res.status(500).send(error)
@@ -74,7 +127,7 @@ module.exports = {
     },
     async delete(req, res){
         try {
-            
+
         } catch (error) {
             
         }

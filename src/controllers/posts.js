@@ -1,5 +1,8 @@
 const Post = require("../models/Post");
 const User = require("../models/User");
+const auth = require("../config/auth");
+const jwt = require("jsonwebtoken");
+
 
 module.exports = {
 
@@ -21,8 +24,14 @@ module.exports = {
                     }
             ]
             });
+            
+            if(posts.length != 0 || posts.length != ""){
+                res.status(200).send(posts)
+            }
+            else{
+                res.status(404).send({Error: "0 postagens encontradas."})
+            }
 
-            res.status(200).send(posts)
 
         } catch (error) {
             console.log(error)
@@ -50,41 +59,57 @@ module.exports = {
         //     }
         // }
 
-
-
         const {firebaseUrl} = req.file ? req.file : " ";
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
 
-        const {title, description, urgency, category, attendance, is_announcement} = req.body;
-        const authorId = req.params.id;
+        const {
+            title, 
+            description, 
+            urgency, 
+            category, 
+            attendance, 
+            is_announcement
+        } = req.body;
+
+        const arrayCategories = category.split(",");
+
+        let idAuthor;
+        let author;
+
 
         try {
 
-            const author = await User.findByPk(authorId);
+            if(payload.clientId != undefined || payload.clientId != null){
+
+                idAuthor = payload.clientId;
+                author = await User.findByPk(idAuthor);
+
+
+            }
+            else if(payload.freelancerId != undefined || payload.freelancerId != null){
+                
+                idAuthor = payload.freelancerId;
+                author = await User.findByPk(idAuthor);
+
+            }
 
             if(author == undefined || author == null){
                 res.status(404).send({Error: "Usuário não encontrado."})
             }
-            
-            let isFromClient;
-            if(author.isFreelancer == 0 || author.isFreelancer == false){
-                isFromClient = true;
-            }
-            else{
-                isFromClient = false;
-            }
-
+     
             let post = await Post.create({
                 title,
                 description,
                 urgency,
                 image: firebaseUrl,
-                user_id: authorId,
                 attendance,
-                isFromClient,
-                is_announcement
+                is_announcement,
+                user_id: idAuthor,
             })
 
-            post.addCategories(category)
+            post.addCategories(arrayCategories)
 
             res.status(201).send({
                 Status: "Success",
@@ -105,23 +130,68 @@ module.exports = {
     
     async update(req, res){
 
-        const {title, description, urgency, image, is_announcement} = req.body;
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
+
+        const {
+            title, 
+            description, 
+            urgency, 
+            image, 
+            is_announcement
+        } = req.body;
 
         const idPost = req.params.id;
+        let idAuthor;
 
         try {
 
+            if(payload.clientId != undefined || payload.clientId != null){
+
+                idAuthor = payload.clientId;
+
+            }
+            else if(payload.freelancerId != undefined || payload.freelancerId != null){
+                
+                idAuthor = payload.freelancerId;
+
+            }
+
             const post = await Post.findByPk(idPost);
 
-            const updatePost = await post.update({
-                title,
-                description,
-                urgency,
-                image,
-                is_announcement
-            })
+            const verifyAuthor = await Post.findOne({where: {
+                id: idPost,
+                user_id: idAuthor
+            }})
 
-            res.status(200).send(updatePost)
+            if(post != null || post != undefined){
+                if(verifyAuthor != null || verifyAuthor != undefined){
+
+                    const updatePost = await post.update({
+                        title,
+                        description,
+                        urgency,
+                        image,
+                        is_announcement
+                    },
+                    {
+                        where:{
+                            user_id: idAuthor
+                        }
+                    })
+
+                    res.status(200).send(updatePost)
+
+        
+                }
+                else{
+                    return res.status(401).send({Error: "Token não autorizado."})
+                }
+            }
+            else{
+                return res.status(404).send({Error: "Postagem não encontrada."})
+            }
             
         } catch (error) {
             console.log(error)
@@ -132,20 +202,54 @@ module.exports = {
 
     async delete(req, res){
 
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
+
         const idPost = req.params.id;
+        let idAuthor;
 
 
         try {
 
-            const deletePost = await Post.destroy({where: {id: idPost}});
+            if(payload.clientId != undefined || payload.clientId != null){
 
-            if(!deletePost){
-                res.status(404).send({Error: "Postagem não encontrada."})
+                idAuthor = payload.clientId;
+
+            }
+            else if(payload.freelancerId != undefined || payload.freelancerId != null){
+                
+                idAuthor = payload.freelancerId;
+
+            }
+
+            const post = await Post.findByPk(idPost);
+
+            const verifyAuthor = await Post.findOne({where: {
+                id: idPost,
+                user_id: idAuthor
+            }})
+
+            if(post != null || post != undefined){
+                if(verifyAuthor != null || verifyAuthor != undefined){
+
+                    await Post.destroy({where: 
+                        {
+                        id: idPost,
+                        user_id: idAuthor
+                        }
+                    });
+
+                    res.status(200).send({Success: "Postagem deletada com sucesso."})
+
+
+                }
+                else{
+                   return res.status(401).send({Error: "Token não autorizado"}) 
+                }
             }
             else{
-                
-                res.status(200).send({Success: "Postagem deletada com sucesso."})
-
+                return res.status(404).send({Error: "Postagem não encontrada."})
             }
 
 

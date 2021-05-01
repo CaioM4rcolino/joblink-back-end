@@ -1,8 +1,12 @@
 //antigo controller de freelancer
 //fazer a tratativa usando o atributo booleano
 const User = require("../models/User");
+const Profession = require("../models/Profession");
 const bcrypt = require('bcryptjs')
 const {generateToken} = require("../utils");
+const auth = require("../config/auth");
+const jwt = require("jsonwebtoken");
+
 
 module.exports = {
 
@@ -85,7 +89,19 @@ module.exports = {
 
      
         const {firebaseUrl} = req.file ? req.file : " ";
-        const {name, email, gender, password, birth_date, cpf, profession, years_experience, history} = req.body;
+        const {
+            name, 
+            email, 
+            gender, 
+            password, 
+            birth_date, 
+            cpf, 
+            profession, 
+            years_experience, 
+            history
+        } = req.body;
+
+        const arrayProfession = profession.split(",");
         const encryptedPassword = bcrypt.hashSync(password)
 
         try {
@@ -119,7 +135,7 @@ module.exports = {
                     return res.status(401).send({Unauthorized: "Você deve aceitar os termos de condições para acessar o sistema."});
                 }
 
-                freelancer.addProfessions(profession);
+                freelancer.addProfessions(arrayProfession);
 
                 const token = generateToken({freelancerId: freelancer.id, freelancerName: freelancer.name});
                 res.status(201).send({freelancer, token});
@@ -138,7 +154,11 @@ module.exports = {
     
     async update(req, res){
 
-        const freelancerId = req.params.id;
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
+        let idFreelancer;
+
         const {
             name, 
             email, 
@@ -154,53 +174,76 @@ module.exports = {
             profession
         } = req.body;
 
-
         try {
 
-            const user = await User.findByPk(freelancerId);
+            if(payload.freelancerId != undefined || payload.freelancerId != null){
 
-            
-            if(user == null || user == undefined){
-                return res.status(404).send({Error: "Usuário não encontrado"})
-            }
-            
-            if(password != undefined){
-
-                if(!bcrypt.compareSync(password, user.password)){
-
-                    user.password = encryptedPassword;
-                    user.save();
-
+                idFreelancer = payload.freelancerId;
+                
+                const user = await User.findByPk(idFreelancer);
+                
+                if(user == null || user == undefined){
+                    return res.status(404).send({Error: "Usuário não encontrado"})
                 }
-                else{
-                    return res.status(400).send({Error: "Insira uma senha diferente da antiga."});
-                }
+                
+                if(password != undefined){
 
-            }
+                    const encryptedPassword = bcrypt.hashSync(password);
 
-            const updateFreelancer = await user.update({
-                    name,
-                    email,
-                    gender,
-                    birth_date,
-                    cpf,
-                    rating,
-                    years_experience,
-                    history,
-                    suspended,
-                    banned,
-                   
-                },
-                {
-                    where:{
-                        id: freelancerId
+                    if(!bcrypt.compareSync(password, user.password)){
+
+                        user.password = encryptedPassword;
+                        user.save();
+
                     }
-                });
+                    else{
+                        return res.status(400).send({Error: "Insira uma senha diferente da antiga."});
+                    }
 
-            if(profession != undefined || profession != null)
-                user.setProfessions(profession)
+                }
+                const updateFreelancer = await user.update({
+                        name,
+                        email,
+                        gender,
+                        birth_date,
+                        cpf,
+                        rating,
+                        years_experience,
+                        history,
+                        suspended,
+                        banned,
+                    
+                    },
+                    {
+                        where:{
+                            id: idFreelancer
+                        }
+                    });
 
-            res.status(200).send(updateFreelancer)
+                if(profession != undefined || profession != null){
+
+                    const verifyProfession = await Profession.findOne({
+                        where:{id: profession}
+                    })
+
+                    if(verifyProfession != undefined || verifyProfession != null){
+
+                        user.setProfessions(profession)
+                        return res.status(200).send(updateFreelancer)
+
+                    }
+                    else{
+                        return res.status(400).send({Error: "Profissão inválida."})
+                    }
+                }
+
+                res.status(200).send(updateFreelancer)
+
+            }
+            else{
+                res.status(401).send({Error: "Token não autorizado."})
+            }
+
             
         } catch (error) {
             console.log(error)
@@ -211,19 +254,31 @@ module.exports = {
 
     async delete(req, res){
 
-        const freelancerId = req.params.id
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
+        let idFreelancer;
 
         try {
 
-            const deleteFreelancer = await User.destroy({where:{id: freelancerId}});
+            if(payload.freelancerId != undefined || payload.freelancerId != null){
 
-            if(!deleteFreelancer){
-                res.status(404).send({Error: "Freelancer não encontrado."})
+                idFreelancer = payload.freelancerId;
+
+                const deleteFreelancer = await User.destroy({where:{id: idFreelancer}});
+
+                if(!deleteFreelancer){
+                    res.status(404).send({Error: "Freelancer não encontrado."})
+                }
+                else{
+                    res.status(200).send({Success: "Freelancer deletado com sucesso."})
+                }
             }
             else{
-                res.status(200).send({Success: "Freelancer deletado com sucesso."})
+                return res.status(401).send({Error: "Token inválido."})
             }
 
+        
             
         } catch (error) {
             console.log(error)

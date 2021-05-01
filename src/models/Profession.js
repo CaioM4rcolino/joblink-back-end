@@ -17,7 +17,6 @@ class Profession extends Model{
 
     static associate(models){
         this.sequelize
-        this.belongsTo(models.User, {foreignKey: "user_id"});
         this.belongsToMany(models.User, {through: "user-profession"})
 
     }
