@@ -2,6 +2,7 @@ const Service = require("../models/Service");
 const Post = require("../models/Post");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
+const { patch } = require("../routes");
 
 
 module.exports = {
@@ -26,8 +27,10 @@ module.exports = {
         const [Bearer, token] = authorization.split(" ");
         const payload = jwt.verify(token, auth.secret);
 
+        const payloadKeys = Object.keys(payload);
+
         const idPost = req.params.idPost;
-        let idUser;
+        const idUser = Object.values(payload)[0];
 
         try {
 
@@ -37,10 +40,8 @@ module.exports = {
                 return res.status(404).send({Error: "Postagem não encontrada."})
             }
 
-            if(payload.clientId != undefined || payload.clientId != null){
+            if(payloadKeys[0] == "clientId"){
                 //significa que o token é de um cliente
-
-                idUser = payload.clientId;
 
                 if(post.is_announcement == true || post.is_announcement == 1){
                     //significa que há um freelancer anunciando serviço
@@ -50,7 +51,7 @@ module.exports = {
                         id_user: idUser
                     }})
 
-                    if(queryServices != undefined || queryServices != null){
+                    if(queryServices != undefined || queryServices != []){
                         return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
                     }
 
@@ -69,10 +70,8 @@ module.exports = {
                 }
 
             }
-            else if(payload.freelancerId != undefined || payload.freelancerId != null){
+            else if(payloadKeys[0] == "freelancerId"){
                 //significa que o token de um freelancer
-
-                idUser = payload.freelancerId;
 
                 if(post.is_announcement == false || post.is_announcement == 0){
                     //significa que há um cliente pedindo serviços
@@ -81,11 +80,7 @@ module.exports = {
                         id_post: idPost,
                         id_user: idUser
                     }})
-
-                    if(queryServices != undefined || queryServices != null){
-                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
-                    }
-
+                
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
@@ -126,10 +121,40 @@ module.exports = {
         }
     },
     async delete(req, res){
+
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
+        const payload = jwt.verify(token, auth.secret);
+
+        const idUser = Object.values(payload)[0];
+        const idPost = req.params.idPost;
+        const idService = req.params.id;
+     
+
         try {
 
+            const service = await Service.findByPk(idService);
+            if(service == null || service == undefined){
+                return res.status(404).send({Error: "Serviço não encontrado."})
+            }
+
+            const post = await Post.findByPk(idPost)
+            if(post == null || post == undefined){
+                return res.status(404).send({Error: "Postagem não encontrado."})
+            }
+
+            if(service.id_user == idUser || post.user_id == idUser){
+
+                await Service.destroy({where:{id: idService}})
+                return res.status(200).send({Success: "Serviço deletado com sucesso."})
+            }
+            else{
+                return res.status(401).send({Unauthorized: "Você não pode deletar este serviço."})
+            }
+
         } catch (error) {
-            
+            console.log(error)
+            res.status(500).send(error)
         }
     },
 

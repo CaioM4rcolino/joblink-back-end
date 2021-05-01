@@ -58,7 +58,7 @@ routes.delete("/posts/:id", controllerPosts.delete);
             *exclui a possibilidade de cliente chamando freelancer via card
 */
 routes.post("/posts/:idPost/service", controllerServices.store);
-routes.delete("/posts/:idPost/service", controllerServices.delete);
+routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
 
 //rota de serviços
 /* 
