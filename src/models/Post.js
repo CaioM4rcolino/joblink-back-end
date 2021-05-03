@@ -10,8 +10,8 @@ class Post extends Model{
             title: DataTypes.STRING,
             description: DataTypes.TEXT,
             image: DataTypes.STRING,
-            urgency: DataTypes.STRING,
-            attendance: DataTypes.STRING,
+            urgency: DataTypes.INTEGER,
+            attendance: DataTypes.INTEGER,
             is_announcement: DataTypes.TINYINT
 
            
@@ -26,7 +26,7 @@ class Post extends Model{
         this.sequelize
         this.belongsTo(models.User, {foreignKey: "user_id"})
         this.belongsToMany(models.Category, {through: "post-category"});
-        this.hasOne(models.Service, {foreignKey: "id_post"});
+        this.hasMany(models.Service, {foreignKey: "id_post"});
 
     }
 }

@@ -40,6 +40,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      adress:{
+        type: Sequelize.STRING,
+        allowNull: false
+      },
+      phone_number:{
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       image:{
         type: Sequelize.STRING,
         allowNull: true

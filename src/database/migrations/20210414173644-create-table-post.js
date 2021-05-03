@@ -22,11 +22,11 @@ module.exports = {
       allowNull: true
     },
     urgency:{
-      type: Sequelize.STRING,
+      type: Sequelize.INTEGER,
       allowNull: false
     },
     attendance:{
-      type: Sequelize.STRING,
+      type: Sequelize.INTEGER,
       allowNull: false
     },
     is_announcement:{
@@ -58,7 +58,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
   
-     
     await queryInterface.dropTable('posts');
      
   }

@@ -4,6 +4,7 @@
   "description": "projeto joblink para encontrar e prestar serviços autônomos",
   "main": "app.js",
   "dependencies": {
+    "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "celebrate": "^14.0.0",
     "cors": "^2.8.5",
