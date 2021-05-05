@@ -2,8 +2,8 @@ const Service = require("../models/Service");
 const Post = require("../models/Post");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
-const { patch } = require("../routes");
-
+const axios = require("axios");
+const AUTH_MERCADO_PAGO = require("../config/mp_credentials.json");
 
 module.exports = {
     
@@ -18,7 +18,7 @@ module.exports = {
                     },
                     {
                         association: "Post",
-                        attributes: ["title", "description"],
+                        attributes: ["id", "title", "description"],
                         include:{
                             association: "User",
                             attributes: ["name"]
@@ -136,32 +136,64 @@ module.exports = {
         }
     },
     async update(req, res){
+
+        const {
+            payer, 
+            shipments, 
+            payment_method_id, 
+            transaction_amount, 
+            rating
+        } = req.body;
+
+        const idPost = req.params.idPost;
+        const idService = req.params.id;
+
         try {
 
-            const {
-                payer, 
-                shipments, 
-                payment_method_id, 
-                transaction_amount
-            } = req.body;
+            const service = await Service.findByPk(idService);
+            if(service == null || service == undefined){
+                return res.status(404).send({Error: "Serviço não encontrado."})
+            }
 
+            const post = await Post.findByPk(idPost)
+            if(post == null || post == undefined){
+                return res.status(404).send({Error: "Postagem não encontrado."})
+            }
+
+            
             const BASE_URL = "https://api.mercadopago.com/v1";
 
             const instance = axios.create({
                 baseUrl: BASE_URL,
-                headers: {'Authorization': AUTH.access_token}
+                headers: {'Authorization': AUTH_MERCADO_PAGO.access_token}
             });
 
             instance.defaults.headers.post['Content-Type'] = 'application/json';
 
-            instance.post(BASE_URL,{
-                payer:{
-
-                }
+            await instance.post("/payments", {
+                payer,
+                shipments,
+                payment_method_id,
+                transaction_amount,
             })
+
+            if(service.id_user == idUser || post.user_id == idUser){
+
+                const updateService = await service.update({
+                    service_cost: transaction_amount,
+                    rating
+                })
+
+                return res.status(200).send(/* service ou instance.response ?*/);
+            }
+            else{
+                return res.status(401).send()
+            }
+
             
         } catch (error) {
-            
+            console.log(error)
+            res.status(500).send(error)
         }
     },
     async delete(req, res){

@@ -53,13 +53,11 @@ routes.delete("/posts/:id", controllerPosts.delete);
 //rota de serviços
 routes.get("/services", controllerServices.index);
 routes.post("/posts/:idPost/service", controllerServices.store);
-
-//caso de postagem e token serem do cliente
 routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
 
 //rota de pagamento
-routes.post("/payment/service/:id", controllerServices.update);
+routes.put("/posts/:idPost/service/:id", controllerServices.update);
 
 
 
