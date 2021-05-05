@@ -51,12 +51,6 @@ routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
 routes.delete("/posts/:id", controllerPosts.delete);
 
 //rota de serviços
-/*
-    possibilidades: cliente vê postagem de anuncio e chama freelancer
-                    freelancer vê postagem de pedido e chama cliente
-
-            *exclui a possibilidade de cliente chamando freelancer via card
-*/
 routes.post("/posts/:idPost/service", controllerServices.store);
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
 
@@ -65,4 +59,7 @@ routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
     possibilidade: somente se cliente faz postagem de pedido e seleciona um freelancer via card
 */
 
+routes.get({
+    
+})
 module.exports = routes;

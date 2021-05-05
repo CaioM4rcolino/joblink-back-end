@@ -12,7 +12,7 @@ class User extends Model{
             gender: DataTypes.STRING,
             password: DataTypes.STRING,
             cpf: DataTypes.STRING,
-            adress: DataTypes.STRING,
+            address: DataTypes.STRING,
             phone_number: DataTypes.STRING,
             image: DataTypes.STRING,
             banned: DataTypes.TINYINT,

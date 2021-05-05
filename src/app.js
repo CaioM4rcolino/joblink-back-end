@@ -1,5 +1,6 @@
 const { errors } = require("celebrate");
 const express = require('express');
+const mercadopago = require('./services/mercadoPago');
 
 const cors = require("cors");
 
@@ -15,6 +16,5 @@ app.use(cors());
 
 app.use(routes);
 app.use(errors());
-
 
 module.exports = app;
