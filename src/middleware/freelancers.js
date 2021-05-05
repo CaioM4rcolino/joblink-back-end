@@ -12,7 +12,8 @@ module.exports = {
             cpf: Joi.string().length(12).required(),
             profession: Joi.string().required(),
             years_experience: Joi.string().min(6),
-            history: Joi.string().max(255)
+            history: Joi.string().max(255),
+            address: Joi.string().required()
 
         })
     }),
@@ -29,7 +30,8 @@ module.exports = {
             years_experience: Joi.string().min(6),
             history: Joi.string().max(255),
             suspended: Joi.boolean(),
-            banned: Joi.boolean()
+            banned: Joi.boolean(),
+            address: Joi.string()
         })
     })
     
