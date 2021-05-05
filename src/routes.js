@@ -16,6 +16,7 @@ const controllerSessions = require('./controllers/sessions')
 const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
+const controllerPayment = require('./controllers/payment');
 
 //rota pública de login (session)
 routes.post("/sessions", controllerSessions.store);
@@ -52,6 +53,7 @@ routes.delete("/posts/:id", controllerPosts.delete);
 
 //rota de serviços
 routes.post("/posts/:idPost/service", controllerServices.store);
+routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
 
 //rota de serviços
@@ -59,7 +61,10 @@ routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
     possibilidade: somente se cliente faz postagem de pedido e seleciona um freelancer via card
 */
 
-routes.get({
-    
-})
+//rota de pagamento
+routes.post("/payment/services/:id", controllerPayment.store);
+
+
+
+
 module.exports = routes;

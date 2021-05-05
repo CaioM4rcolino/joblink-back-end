@@ -1,8 +1,7 @@
 
 var admin = require("firebase-admin");
-
 var serviceAccount = require("../config/firebase-key");
-const { route } = require("../routes");
+
 
 const bucketAdress = "joblinkproject.appspot.com";
 
@@ -27,7 +26,7 @@ const uploadImagem = (req, res, next) => {
     let filePath;
     
     switch(req.route.path){
-        case "/posts/:id":
+        case "/posts":
             filePath = "post-images/";
             file = bucket.file(filePath + fileName);
             break;
