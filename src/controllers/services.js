@@ -9,9 +9,31 @@ module.exports = {
     
     async index(req, res){
         try {
+
+            const queryServices = await Service.findAll({
+                include:[
+                    {
+                        association: "User",
+                        attributes: ["name"]
+                    },
+                    {
+                        association: "Post",
+                        attributes: ["title", "description"],
+                        include:{
+                            association: "User",
+                            attributes: ["name"]
+                        }
+                    }
+                    
+                ],
+                
+            })
+
+            res.status(200).send(queryServices)
             
         } catch (error) {
-            
+            console.log(error)
+            res.status(500).send(error)
         }
     },
     async find(req, res){
@@ -51,7 +73,7 @@ module.exports = {
                         id_user: idUser
                     }})
 
-                    if(queryServices != undefined || queryServices != []){
+                    if(queryServices.length != 0){
                         return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
                     }
 
@@ -115,6 +137,28 @@ module.exports = {
     },
     async update(req, res){
         try {
+
+            const {
+                payer, 
+                shipments, 
+                payment_method_id, 
+                transaction_amount
+            } = req.body;
+
+            const BASE_URL = "https://api.mercadopago.com/v1";
+
+            const instance = axios.create({
+                baseUrl: BASE_URL,
+                headers: {'Authorization': AUTH.access_token}
+            });
+
+            instance.defaults.headers.post['Content-Type'] = 'application/json';
+
+            instance.post(BASE_URL,{
+                payer:{
+
+                }
+            })
             
         } catch (error) {
             

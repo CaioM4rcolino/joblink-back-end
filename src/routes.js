@@ -16,7 +16,6 @@ const controllerSessions = require('./controllers/sessions')
 const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
-const controllerPayment = require('./controllers/payment');
 
 //rota pública de login (session)
 routes.post("/sessions", controllerSessions.store);
@@ -52,17 +51,15 @@ routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
 routes.delete("/posts/:id", controllerPosts.delete);
 
 //rota de serviços
+routes.get("/services", controllerServices.index);
 routes.post("/posts/:idPost/service", controllerServices.store);
+
+//caso de postagem e token serem do cliente
 routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
 
-//rota de serviços
-/* 
-    possibilidade: somente se cliente faz postagem de pedido e seleciona um freelancer via card
-*/
-
 //rota de pagamento
-routes.post("/payment/services/:id", controllerPayment.store);
+routes.post("/payment/service/:id", controllerServices.update);
 
 
 
