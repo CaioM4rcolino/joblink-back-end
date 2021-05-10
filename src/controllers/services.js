@@ -2,8 +2,9 @@ const Service = require("../models/Service");
 const Post = require("../models/Post");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
-const axios = require("axios");
-const AUTH_MERCADO_PAGO = require("../config/mp_credentials.json");
+const AUTH_MERCADO_PAGO = require("../config/mp-test-credentials.json");
+var mercadopago = require('mercadopago');
+
 
 module.exports = {
     
@@ -148,47 +149,45 @@ module.exports = {
         const idPost = req.params.idPost;
         const idService = req.params.id;
 
+        mercadopago.configurations.setAccessToken(AUTH_MERCADO_PAGO.access_token);
+
+
         try {
 
-            const service = await Service.findByPk(idService);
-            if(service == null || service == undefined){
-                return res.status(404).send({Error: "Serviço não encontrado."})
-            }
+            // const service = await Service.findByPk(idService);
+            // if(service == null || service == undefined){
+            //     return res.status(404).send({Error: "Serviço não encontrado."})
+            // }
 
-            const post = await Post.findByPk(idPost)
-            if(post == null || post == undefined){
-                return res.status(404).send({Error: "Postagem não encontrado."})
-            }
+            // const post = await Post.findByPk(idPost)
+            // if(post == null || post == undefined){
+            //     return res.status(404).send({Error: "Postagem não encontrado."})
+            // }
 
-            
-            const BASE_URL = "https://api.mercadopago.com/v1";
 
-            const instance = axios.create({
-                baseUrl: BASE_URL,
-                headers: {'Authorization': AUTH_MERCADO_PAGO.access_token}
-            });
-
-            instance.defaults.headers.post['Content-Type'] = 'application/json';
-
-            await instance.post("/payments", {
-                payer,
-                shipments,
-                payment_method_id,
-                transaction_amount,
+            const payment = await mercadopago.post("/v1/payments", {
+                payer, 
+                shipments, 
+                payment_method_id, 
+                transaction_amount, 
             })
 
-            if(service.id_user == idUser || post.user_id == idUser){
+            // payment_methods = await mercadopago.get("/v1/payment_methods");
 
-                const updateService = await service.update({
-                    service_cost: transaction_amount,
-                    rating
-                })
+            return res.status(200).send(payment);
 
-                return res.status(200).send(/* service ou instance.response ?*/);
-            }
-            else{
-                return res.status(401).send()
-            }
+            // if(service.id_user == idUser || post.user_id == idUser){
+
+            //     const updateService = await service.update({
+            //         service_cost: transaction_amount,
+            //         rating
+            //     })
+
+            //     return res.status(200).send(service);
+            // }
+            // else{
+            //     return res.status(401).send()
+            // }
 
             
         } catch (error) {

@@ -17,6 +17,8 @@ const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
 
+const mercadoPagoApi = require('./services/tests/mercadoPagoApi');
+
 //rota pública de login (session)
 routes.post("/sessions", controllerSessions.store);
 routes.post("/clients", multerValidator, middlewareClients.create, uploadFirebase, controllerClients.store);
@@ -57,8 +59,10 @@ routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerService
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
 
 //rota de pagamento
-routes.put("/posts/:idPost/service/:id", controllerServices.update);
+routes.put("/test", controllerServices.update);
 
+//rota de teste da API Mercado Pago
+routes.post("/mercadopago/customer", mercadoPagoApi.createCostumer);
 
 
 
