@@ -138,62 +138,7 @@ module.exports = {
     },
     async update(req, res){
 
-        const {
-            payer, 
-            shipments, 
-            payment_method_id, 
-            transaction_amount, 
-            rating
-        } = req.body;
-
-        const idPost = req.params.idPost;
-        const idService = req.params.id;
-
-        mercadopago.configurations.setAccessToken(AUTH_MERCADO_PAGO.access_token);
-
-
-        try {
-
-            // const service = await Service.findByPk(idService);
-            // if(service == null || service == undefined){
-            //     return res.status(404).send({Error: "Serviço não encontrado."})
-            // }
-
-            // const post = await Post.findByPk(idPost)
-            // if(post == null || post == undefined){
-            //     return res.status(404).send({Error: "Postagem não encontrado."})
-            // }
-
-
-            const payment = await mercadopago.post("/v1/payments", {
-                payer, 
-                shipments, 
-                payment_method_id, 
-                transaction_amount, 
-            })
-
-            // payment_methods = await mercadopago.get("/v1/payment_methods");
-
-            return res.status(200).send(payment);
-
-            // if(service.id_user == idUser || post.user_id == idUser){
-
-            //     const updateService = await service.update({
-            //         service_cost: transaction_amount,
-            //         rating
-            //     })
-
-            //     return res.status(200).send(service);
-            // }
-            // else{
-            //     return res.status(401).send()
-            // }
-
-            
-        } catch (error) {
-            console.log(error)
-            res.status(500).send(error)
-        }
+  
     },
     async delete(req, res){
 
