@@ -19,12 +19,10 @@ const controllerServices = require('./controllers/services');
 
 const mercadoPagoApi = require('./services/tests/mercadoPagoApi');
 
-//rota pública de login (session)
+//rotas públicas
 routes.post("/sessions", controllerSessions.store);
 routes.post("/clients", multerValidator, middlewareClients.create, uploadFirebase, controllerClients.store);
 routes.post("/freelancers", multerValidator, middlewareFreelancers.create, uploadFirebase, controllerFreelancers.store);
-
-//rota de pesquisa
 routes.get("/search", controllerSearching.find)
 
 //middleware que verifica o token
@@ -59,12 +57,10 @@ routes.post("/posts/:idPost/service", controllerServices.store);
 //cliente dono da postagem e dono do token
 routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
+routes.put("/services/:id", controllerServices.update);
 
-//rota de pagamento
-routes.put("/test", controllerServices.update);
-
-//rota de teste da API Mercado Pago
-routes.post("/mercadopago/customer", mercadoPagoApi.createCostumer);
+//rota de preferencia
+routes.post("/create_preference", mercadoPagoApi.createPreference);
 
 
 

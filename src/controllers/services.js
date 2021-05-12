@@ -2,9 +2,7 @@ const Service = require("../models/Service");
 const Post = require("../models/Post");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
-const AUTH_MERCADO_PAGO = require("../config/mp-test-credentials.json");
-var mercadopago = require('mercadopago');
-
+const mercadopago = require("../services/tests/mercadoPagoApi");
 
 module.exports = {
     
@@ -137,6 +135,10 @@ module.exports = {
         }
     },
     async update(req, res){
+
+        const idService = req.params.id;
+
+        
 
   
     },

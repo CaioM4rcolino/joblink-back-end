@@ -1,45 +1,56 @@
+const Service = require('../../models/Service');
 var mercadopago = require('mercadopago');
 const config = require("../../config/mp-test-credentials.json");
+const auth = require("../../config/auth.json");
+const jwt = require("jsonwebtoken");
 
 module.exports = {
 
-    async createCostumer(req, res){
+    async createPreference(req, res){
 
-        // Adicione as credenciais
-        // mercadopago.configure({
-        //     access_token: config.access_token
-        // });
+        //return console.log(mercadopago.preferences.schema.properties.collector_id)
 
-        // const {
-        //     first_name, 
-        //     last_name, 
-        //     email, 
-        //     phone, 
-        //     address, 
-        //     identification, 
-        //     data_registered, 
-        //     default_card
-        // } = req.body;
+        // se is_from_client = true então
 
-        // try {
+        //     client_id: idUser,
+        //     collector_id: idPost
 
-        //     const newCostumer = await mercadopago.post("/v1/customers", {
-        //         first_name,
-        //         last_name,
-        //         email,
-        //         phone,
-        //         address: Number(address),
-        //         identification,
-        //         data_registered,
-        //         default_card
-        //     })
-    
-        //     return res.status(200).send(newCostumer);
+        //     se is_from_client = false então
 
-        // } catch (error) {
-        //     console.log(error)
-        //     res.status(500).send(error)
-        // }
+        //     client_id: idPost,
+        //     collector_id: idUser
+
+        mercadopago.configure({
+            access_token: config.access_token
+        });
+
+        const {
+            payer,
+            payment_methods,
+            shipments, 
+            items,
+            client_id
+        } = req.body;
+
+        try {
+
+            let preference_data = {
+                    payer,
+                    payment_methods,
+                    shipments,
+                    client_id,
+                    items
+                }
+
+            const preference = await mercadopago.preferences.create(preference_data)
+           
+            res.status(200).send(preference)
+            
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
 
     },
     
