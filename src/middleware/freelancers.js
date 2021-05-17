@@ -13,7 +13,9 @@ module.exports = {
             profession: Joi.string().required(),
             years_experience: Joi.string().min(6),
             history: Joi.string().max(255),
-            address: Joi.string().required()
+            address: Joi.string().required(),
+            phone_number: Joi.string().pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/)
+
 
         })
     }),
@@ -31,7 +33,9 @@ module.exports = {
             history: Joi.string().max(255),
             suspended: Joi.boolean(),
             banned: Joi.boolean(),
-            address: Joi.string()
+            address: Joi.string(),
+            phone_number: Joi.string().pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/).required()
+
         })
     })
     

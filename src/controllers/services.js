@@ -3,6 +3,7 @@ const Post = require("../models/Post");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
 const mercadopago = require("../services/tests/mercadoPagoApi");
+const User = require("../models/User");
 
 module.exports = {
     
@@ -138,8 +139,58 @@ module.exports = {
 
         const idService = req.params.id;
 
-        
+        //token = pagante
+        const{authorization} = req.headers;
+        const [Bearer, token] = authorization.split(" ");
 
+        const payload = jwt.verify(token, auth.secret);
+        const payloadKeys = Object.keys(payload);
+        const idUser = Object.values(payload)[0];
+
+        try {
+
+            const service = await Service.findOne({
+                where: {
+                    id_user: idUser
+                }
+            })
+
+            if(service.length == 0){
+                return res.status(404).send({Error: "Serviço não encontrado."})
+            }
+
+            const user = await User.findByPk(idUser);
+
+            const user_name = user.name.split(" ")[0]
+            const user_surname = user.name.split(" ")[1]
+
+            const user_phone_area_code = user.phone_number.substring(0, 2);
+
+            return console.log(user_phone_area_code)
+
+            const apiRequest = {
+                payer:{
+                    name: user_name,
+                    surname: user_surname,
+                    email: user.email,
+                    identification: {
+                        number: user.cpf
+                    },
+                    phone:{
+                        area_code
+                    }
+                }
+            }
+
+            return console.log(user);
+
+          
+
+
+            
+        } catch (error) {
+            
+        }
   
     },
     async delete(req, res){

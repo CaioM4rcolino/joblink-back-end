@@ -28,8 +28,7 @@ module.exports = {
             payer,
             payment_methods,
             shipments, 
-            items,
-            client_id
+            items
         } = req.body;
 
         try {
@@ -38,7 +37,6 @@ module.exports = {
                     payer,
                     payment_methods,
                     shipments,
-                    client_id,
                     items
                 }
 

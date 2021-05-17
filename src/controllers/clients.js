@@ -70,7 +70,7 @@ module.exports = {
         // }
 
         const {firebaseUrl} = req.file ? req.file : " ";
-        const {name, email, gender, password, birth_date, cpf, address} = req.body;
+        const {name, email, gender, password, birth_date, cpf, address, phone_number} = req.body;
         const encryptedPassword = bcrypt.hashSync(password)
 
 
@@ -92,7 +92,8 @@ module.exports = {
                     suspended: false,
                     is_freelancer: false,
                     agreed_policy: true,
-                    address
+                    address,
+                    phone_number
                 });
 
                 client.createClient();
@@ -134,7 +135,8 @@ module.exports = {
             cpf, 
             suspended, 
             banned,
-            address
+            address,
+            phone_number
         } = req.body;
 
 
@@ -175,7 +177,8 @@ module.exports = {
                         cpf,
                         suspended,
                         banned,
-                        address
+                        address,
+                        phone_number
                     },
                     {
                         where:{

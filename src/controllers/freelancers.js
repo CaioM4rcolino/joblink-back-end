@@ -99,7 +99,8 @@ module.exports = {
             profession, 
             years_experience, 
             history,
-            address
+            address,
+            phone_number
         } = req.body;
 
         const arrayProfession = profession.split(",");
@@ -124,7 +125,8 @@ module.exports = {
                     banned: false, 
                     suspended: false,
                     agreed_policy: true,
-                    address
+                    address,
+                    phone_number
                 });
 
                 freelancer.createFreelancer({
@@ -174,7 +176,8 @@ module.exports = {
             suspended, 
             banned, 
             profession,
-            address
+            address,
+            phone_number
         } = req.body;
 
         try {
@@ -215,7 +218,8 @@ module.exports = {
                         history,
                         suspended,
                         banned,
-                        address
+                        address,
+                        phone_number
                     
                     },
                     {
