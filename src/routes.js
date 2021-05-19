@@ -16,6 +16,7 @@ const controllerSessions = require('./controllers/sessions')
 const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
+const controllerProfessions = require('./controllers/professions');
 
 const mercadoPagoApi = require('./services/tests/mercadoPagoApi');
 
@@ -62,6 +63,7 @@ routes.put("/services/:id", controllerServices.update);
 //rota de preferencia
 routes.post("/create_preference", mercadoPagoApi.createPreference);
 
-
+//rota de profissões
+routes.get("/professions", controllerProfessions.index)
 
 module.exports = routes;

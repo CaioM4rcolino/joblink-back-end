@@ -7,4 +7,17 @@ const generateToken = (payload) => {
     });
 };
 
-module.exports = {generateToken};
+const validateModel = async (res, id, Model, modelName) => {
+    
+    const model = await Model.findByPk(id)
+
+    if(model == null || model == undefined || model.length == 0){
+        return res.status(404).send({Error: `${modelName} não encontrado(a).`})
+    }
+    else{
+        return model;
+    }
+
+}
+
+module.exports = {generateToken, validateModel};
