@@ -1,10 +1,7 @@
 const Service = require("../models/Service");
 const Post = require("../models/Post");
-const auth = require("../config/auth");
-const jwt = require("jsonwebtoken");
-const mercadopago = require("../services/mercadoPagoApi");
 const User = require("../models/User");
-const {validateModel} = require("../utils");
+const {validateModel, getPayload} = require("../utils");
 
 module.exports = {
     
@@ -46,10 +43,7 @@ module.exports = {
     },
     async store(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
-
+        const payload = getPayload(req)
         const payloadKeys = Object.keys(payload);
 
         const idPost = req.params.idPost;
@@ -57,11 +51,7 @@ module.exports = {
 
         try {
 
-            const post = await Post.findByPk(idPost);
-
-            if(post == null || post == undefined || post == ""){
-                return res.status(404).send({Error: "Postagem não encontrada."})
-            }
+            const post = validateModel(res, idPost, Post, "Postagem")
 
             if(payloadKeys[0] == "clientId"){
                 //significa que o token é de um cliente
@@ -138,9 +128,7 @@ module.exports = {
     },
     async update(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
+        const payload = getPayload(req)
 
         const {service_cost} = req.body;
 
@@ -205,10 +193,8 @@ module.exports = {
     },
     async delete(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
-
+        const payload = getPayload(req)
+    
         const idUser = Object.values(payload)[0];
         const idPost = req.params.idPost;
         const idService = req.params.id;
@@ -216,15 +202,8 @@ module.exports = {
 
         try {
 
-            const service = await Service.findByPk(idService);
-            if(service == null || service == undefined){
-                return res.status(404).send({Error: "Serviço não encontrado."})
-            }
-
-            const post = await Post.findByPk(idPost)
-            if(post == null || post == undefined){
-                return res.status(404).send({Error: "Postagem não encontrado."})
-            }
+            const service = await validateModel(res, idService, Service, "Serviço")
+            const post = await validateModel(res, idPost, Post, "Postagem")
 
             if(service.id_user == idUser || post.user_id == idUser){
 

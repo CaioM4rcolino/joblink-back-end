@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const {generateToken} = require("../utils");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
+const {validateModel, getPayload} = require("../utils")
 
 
 
@@ -122,9 +123,7 @@ module.exports = {
     
     async update(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
+        const payload = getPayload(req);
 
         const {
             name, 
@@ -147,12 +146,9 @@ module.exports = {
             if(payload.clientId != undefined || payload.clientId != null){
 
                 idClient = payload.clientId;
-                const user = await User.findByPk(idClient);
 
-                if(user == undefined || user == null || user == ""){
-                    return res.status(404).send({Error: "Cliente não encontrado."})
-                }
-
+                const user = await validateModel(res, idClient, User, "Cliente")
+                
                 if(password != undefined){
 
                     const encryptedPassword = bcrypt.hashSync(password)
@@ -203,9 +199,7 @@ module.exports = {
 
     async delete(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
+        const payload = getPayload(req);
         let idClient;
 
         try {

@@ -7,17 +7,28 @@ const generateToken = (payload) => {
     });
 };
 
-const validateModel = async (res, id, Model, modelName) => {
-    
-    const model = await Model.findByPk(id)
+const validateModel = (res, id, Model, modelName) => {
 
-    if(model == null || model == undefined){
+    const model = Model.findByPk(id)
+
+    if(model == null || model == undefined)
         return res.status(404).send({Error: `${modelName} não encontrado(a).`})
-    }
-    else{
-        return model;
-    }
+    else
+        return model;    
+    
+}
+
+const getPayload = (req) => {
+
+    const auth = require("../src/config/auth");
+    const jwt = require("jsonwebtoken");
+
+    const{authorization} = req.headers;
+    const [Bearer, token] = authorization.split(" ");
+    const payload = jwt.verify(token, auth.secret);
+
+    return payload;
 
 }
 
-module.exports = {generateToken, validateModel};
+module.exports = {generateToken, validateModel, getPayload};
