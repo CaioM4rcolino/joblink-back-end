@@ -58,15 +58,19 @@ module.exports = {
             const freelancerId = req.params;
 
 
-            const findFreelancerById = await User.findOne({where:{isFreelancer: 1, id: freelancerId},
+            const findFreelancerById = await User.findOne({where:{is_freelancer: 1, id: freelancerId},
                 attributes:["id",
                  "name", 
                  "birth_date", 
                  "email", 
                  "cpf", 
-                 "years_experience", 
-                 "history", 
-                 "image"]
+                 "image"],
+                include:[
+                    {
+                        association: "Freelancer",
+                        attributes: ["years_experience", "history"]
+                    }
+                ]
             })
     
             if(findFreelancerById == null){

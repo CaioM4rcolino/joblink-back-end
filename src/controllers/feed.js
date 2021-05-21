@@ -9,7 +9,7 @@ module.exports = {
 
                     {
                         association: "User",
-                        attributes: ["id", "name"]
+                        attributes: ["id", "name", "is_freelancer"]
                     },
 
                     {
