@@ -55,16 +55,10 @@ module.exports = {
 
         try {
 
-            const freelancerId = req.params;
+            const freelancerId = req.params.id;
 
 
             const findFreelancerById = await User.findOne({where:{is_freelancer: 1, id: freelancerId},
-                attributes:["id",
-                 "name", 
-                 "birth_date", 
-                 "email", 
-                 "cpf", 
-                 "image"],
                 include:[
                     {
                         association: "Freelancer",
