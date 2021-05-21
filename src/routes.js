@@ -16,9 +16,10 @@ const controllerSessions = require('./controllers/sessions')
 const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
-const controllerProfessions = require('./controllers/professions');
+const controllerPayment = require('./controllers/payments');
+const controllerProfessions = require('./controllers/professions')
 
-const mercadoPagoApi = require('./services/tests/mercadoPagoApi');
+const mercadoPagoApi = require('./services/testPreference');
 
 //rotas públicas
 routes.post("/sessions", controllerSessions.store);
@@ -54,13 +55,17 @@ routes.delete("/posts/:id", controllerPosts.delete);
 //rota de serviços
 routes.get("/services", controllerServices.index);
 routes.post("/posts/:idPost/service", controllerServices.store);
-
-//cliente dono da postagem e dono do token
+//TODO: cliente dono da postagem e dono do token
 routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
 routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
-routes.put("/services/:id", controllerServices.update);
 
-//rota de preferencia
+//setar preço do serviço (só para o freelancer)
+routes.put("/posts/:idPost/service/:id", controllerServices.update)
+
+//rota de pagamento (só para o cliente)
+routes.put("/payment/services/:id", controllerPayment.store);
+
+//rota teste de preferencia 
 routes.post("/create_preference", mercadoPagoApi.createPreference);
 
 //rota de profissões

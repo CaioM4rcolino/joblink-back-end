@@ -8,7 +8,7 @@ module.exports = {
             title: Joi.string().min(5).max(50).required(),
             description: Joi.string().min(10).max(1000).required(),
             urgency: Joi.number().integer().required(),
-            attendance: Joi.boolean().required(),
+            attendance: Joi.number().integer().required(),
             is_announcement: Joi.boolean().required(),
             category: Joi.string().required()
         })

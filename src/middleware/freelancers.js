@@ -34,7 +34,7 @@ module.exports = {
             suspended: Joi.boolean(),
             banned: Joi.boolean(),
             address: Joi.string(),
-            phone_number: Joi.string().pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/).required()
+            phone_number: Joi.string().pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/)
 
         })
     })
