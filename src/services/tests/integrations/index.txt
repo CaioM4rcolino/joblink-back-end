@@ -1,0 +1,2 @@
+require("./freelancers.js");
+require("./posts.js");

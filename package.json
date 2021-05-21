@@ -4,25 +4,32 @@
   "description": "projeto joblink para encontrar e prestar serviços autônomos",
   "main": "app.js",
   "dependencies": {
+    "@types/jest": "^26.0.23",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
     "celebrate": "^14.0.0",
     "cors": "^2.8.5",
+    "cpf-cnpj-validator": "^1.0.3",
+    "cross-env": "^7.0.3",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "firebase-admin": "^9.6.0",
+    "jest": "^26.6.3",
     "jsonwebtoken": "^8.5.1",
     "mercadopago": "^1.5.7",
     "multer": "^1.4.2",
     "mysql2": "^2.2.5",
     "nodemon": "^2.0.7",
     "sequelize": "^6.6.2",
-    "sequelize-cli": "^6.2.0"
+    "sequelize-cli": "^6.2.0",
+    "supertest": "^6.1.3"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/server.js"
+    "start": "nodemon src/server.js",
+    "pretest": "cross-env NODE_ENV=test npx sequelize db:migrate",
+    "test": "jest",
+    "posttest": "cross-env NODE_ENV=test npx sequelize db:migrate:undo:all"
   },
   "repository": {
     "type": "git",

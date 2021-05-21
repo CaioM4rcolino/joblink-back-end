@@ -17,7 +17,7 @@ const controllerSearching = require('./controllers/searching')
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
 
-const mercadoPagoApi = require('./services/tests/mercadoPagoApi');
+const mercadoPagoApi = require('./services/mercadoPagoApi');
 
 //rota pública de login (session)
 routes.post("/sessions", controllerSessions.store);
@@ -26,6 +26,7 @@ routes.post("/freelancers", multerValidator, middlewareFreelancers.create, uploa
 
 //rota de pesquisa
 routes.get("/search", controllerSearching.find)
+
 
 //middleware que verifica o token
 routes.use(authMiddleware);
