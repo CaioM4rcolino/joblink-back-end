@@ -109,7 +109,7 @@ module.exports = {
                 user_id: idAuthor,
             })
 
-            post.addCategories(arrayCategories)
+            await post.addCategories(arrayCategories)
 
             res.status(201).send({
                 Status: "Success",
