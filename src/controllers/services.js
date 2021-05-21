@@ -51,7 +51,7 @@ module.exports = {
 
         try {
 
-            const post = validateModel(res, idPost, Post, "Postagem")
+            const post = await validateModel(res, idPost, Post, "Postagem")
 
             if(payloadKeys[0] == "clientId"){
                 //significa que o token é de um cliente
@@ -159,7 +159,7 @@ module.exports = {
                 return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
             }
 
-            const post = validateModel(res, idPost, Post, "Postagem");
+            const post = await validateModel(res, idPost, Post, "Postagem");
 
             const service = await Service.findOne({
                 where: {
@@ -167,10 +167,10 @@ module.exports = {
                     id_post: idPost
                 }
             })
+
             if(service == null || service == undefined){
                 return res.status(404).send({Error: "Serviço não encontrado."})
             }
-
 
             if(post.is_announcement == true){
                 if(user.id != post.user_id){
