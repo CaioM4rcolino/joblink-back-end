@@ -65,5 +65,6 @@ routes.post("/create_preference", mercadoPagoApi.createPreference);
 
 //rota de profissões
 routes.get("/professions", controllerProfessions.index)
+routes.get("/professions/:id", controllerProfessions.find)
 
 module.exports = routes;

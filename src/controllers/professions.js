@@ -17,5 +17,26 @@ module.exports = {
             console.log(error)
             res.status(500).send(error)
         }
+    },
+    
+    async find(req, res){
+
+        const idProfession = req.params.id;
+
+        try {
+
+            const getProfessionById = await Profession.findByPk(idProfession)
+
+            if(getProfessionById != null || getProfessionById != undefined){
+                return res.status(200).send(getProfessionById)
+            }
+            else{
+                return res.status(404).send({Error: "Profissão não encontrada."})
+            }
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
     }
 }
