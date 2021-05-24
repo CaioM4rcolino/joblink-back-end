@@ -2,7 +2,7 @@ const Post = require("../models/Post");
 const User = require("../models/User");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
-
+const {getPayload} = require("../utils");
 
 module.exports = {
 
@@ -60,9 +60,8 @@ module.exports = {
         // }
 
         const {firebaseUrl} = req.file ? req.file : " ";
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
+
+        const payload = getPayload(req);
 
         const {
             title, 
@@ -109,7 +108,7 @@ module.exports = {
                 user_id: idAuthor,
             })
 
-            post.addCategories(arrayCategories)
+            await post.addCategories(arrayCategories)
 
             res.status(201).send({
                 Status: "Success",
@@ -130,10 +129,8 @@ module.exports = {
     
     async update(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
-
+        const payload = getPayload(req);
+      
         const {
             title, 
             description, 
@@ -202,10 +199,7 @@ module.exports = {
 
     async delete(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
-
+        const payload = getPayload(req)
         const idPost = req.params.id;
         let idAuthor;
 

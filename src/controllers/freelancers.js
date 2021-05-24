@@ -3,7 +3,7 @@
 const User = require("../models/User");
 const Profession = require("../models/Profession");
 const bcrypt = require('bcryptjs')
-const {generateToken} = require("../utils");
+const {generateToken, validateModel, getPayload} = require("../utils");
 const auth = require("../config/auth");
 const jwt = require("jsonwebtoken");
 
@@ -55,18 +55,16 @@ module.exports = {
 
         try {
 
-            const freelancerId = req.params;
+            const freelancerId = req.params.id;
 
 
-            const findFreelancerById = await User.findOne({where:{isFreelancer: 1, id: freelancerId},
-                attributes:["id",
-                 "name", 
-                 "birth_date", 
-                 "email", 
-                 "cpf", 
-                 "years_experience", 
-                 "history", 
-                 "image"]
+            const findFreelancerById = await User.findOne({where:{is_freelancer: 1, id: freelancerId},
+                include:[
+                    {
+                        association: "Freelancer",
+                        attributes: ["years_experience", "history"]
+                    }
+                ]
             })
     
             if(findFreelancerById == null){
@@ -87,7 +85,6 @@ module.exports = {
     
     async store(req, res){
 
-     
         const {firebaseUrl} = req.file ? req.file : " ";
         const {
             name, 
@@ -158,9 +155,7 @@ module.exports = {
     
     async update(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
+        const payload = getPayload(req)
         let idFreelancer;
 
         const {
@@ -186,12 +181,8 @@ module.exports = {
 
                 idFreelancer = payload.freelancerId;
                 
-                const user = await User.findByPk(idFreelancer);
-                
-                if(user == null || user == undefined){
-                    return res.status(404).send({Error: "Usuário não encontrado"})
-                }
-                
+                const user = await validateModel(res, idFreelancer, User, "Usuário")
+            
                 if(password != undefined){
 
                     const encryptedPassword = bcrypt.hashSync(password);
@@ -262,9 +253,7 @@ module.exports = {
 
     async delete(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
+        const payload = getPayload(req);
         let idFreelancer;
 
         try {

@@ -1,9 +1,7 @@
 const Service = require("../models/Service");
 const Post = require("../models/Post");
-const auth = require("../config/auth");
-const jwt = require("jsonwebtoken");
-const mercadopago = require("../services/tests/mercadoPagoApi");
 const User = require("../models/User");
+const {validateModel, getPayload} = require("../utils");
 
 module.exports = {
     
@@ -45,10 +43,7 @@ module.exports = {
     },
     async store(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
-
+        const payload = getPayload(req)
         const payloadKeys = Object.keys(payload);
 
         const idPost = req.params.idPost;
@@ -56,11 +51,7 @@ module.exports = {
 
         try {
 
-            const post = await Post.findByPk(idPost);
-
-            if(post == null || post == undefined || post == ""){
-                return res.status(404).send({Error: "Postagem não encontrada."})
-            }
+            const post = await validateModel(res, idPost, Post, "Postagem")
 
             if(payloadKeys[0] == "clientId"){
                 //significa que o token é de um cliente
@@ -137,68 +128,73 @@ module.exports = {
     },
     async update(req, res){
 
+        const payload = getPayload(req)
+
+        const {service_cost} = req.body;
+
+        const idPost = req.params.idPost;
         const idService = req.params.id;
-
-        //token = pagante
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-
-        const payload = jwt.verify(token, auth.secret);
-        const payloadKeys = Object.keys(payload);
         const idUser = Object.values(payload)[0];
 
         try {
 
+            const updateServiceCost = async (service, service_cost, idService, idPost) => {
+
+                const updateService = await service.update({
+                    service_cost: service_cost
+                },
+                {
+                    where:{
+                        id: idService,
+                        id_post: idPost
+                    }
+                })
+
+                return res.status(200).send(updateService)
+            }
+
+            const user = await User.findByPk(idUser)
+
+            if(user.is_freelancer == false){
+                return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
+            }
+
+            const post = await validateModel(res, idPost, Post, "Postagem");
+
             const service = await Service.findOne({
                 where: {
-                    id_user: idUser
+                    id: idService,
+                    id_post: idPost
                 }
             })
 
-            if(service.length == 0){
+            if(service == null || service == undefined){
                 return res.status(404).send({Error: "Serviço não encontrado."})
             }
 
-            const user = await User.findByPk(idUser);
-
-            const user_name = user.name.split(" ")[0]
-            const user_surname = user.name.split(" ")[1]
-
-            const user_phone_area_code = user.phone_number.substring(0, 2);
-
-            return console.log(user_phone_area_code)
-
-            const apiRequest = {
-                payer:{
-                    name: user_name,
-                    surname: user_surname,
-                    email: user.email,
-                    identification: {
-                        number: user.cpf
-                    },
-                    phone:{
-                        area_code
-                    }
+            if(post.is_announcement == true){
+                if(user.id != post.user_id){
+                    return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
+                }
+                else{
+                    updateServiceCost(service, service_cost, idService, idPost);
                 }
             }
-
-            return console.log(user);
-
-          
-
-
+            else{
+              updateServiceCost(service, service_cost, idService, idPost);
+            }
+            
             
         } catch (error) {
-            
+            console.log(error)
+            res.status(500).send(error)
         }
   
     },
     async delete(req, res){
 
-        const{authorization} = req.headers;
-        const [Bearer, token] = authorization.split(" ");
-        const payload = jwt.verify(token, auth.secret);
-
+        const payload = getPayload(req)
+    
         const idUser = Object.values(payload)[0];
         const idPost = req.params.idPost;
         const idService = req.params.id;
@@ -206,15 +202,8 @@ module.exports = {
 
         try {
 
-            const service = await Service.findByPk(idService);
-            if(service == null || service == undefined){
-                return res.status(404).send({Error: "Serviço não encontrado."})
-            }
-
-            const post = await Post.findByPk(idPost)
-            if(post == null || post == undefined){
-                return res.status(404).send({Error: "Postagem não encontrado."})
-            }
+            const service = await validateModel(res, idService, Service, "Serviço")
+            const post = await validateModel(res, idPost, Post, "Postagem")
 
             if(service.id_user == idUser || post.user_id == idUser){
 
