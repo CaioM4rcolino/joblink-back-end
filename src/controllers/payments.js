@@ -3,6 +3,8 @@ const config = require("../config/mp-test-credentials.json");
 const User = require("../models/User");
 const Service = require("../models/Service");
 const {getPayload} = require("../utils");
+const Post = require('../models/Post');
+const BalanceRegister = require("../models/BalanceRegister");
 
 
 module.exports = {
@@ -16,26 +18,32 @@ module.exports = {
         const payloadKeys = Object.keys(payload);
 
         const idService = req.params.id;
+        const idPost = req.params.idPost;
         const idUser = Object.values(payload)[0];
 
-        const{payment_methods, rating} = req.body;
+        const{payment_methods, rating, feedback} = req.body;
 
         try {
 
             const service = await Service.findOne({
                 where: {
                     id: idService,
-                    id_user: idUser,
+                    id_post: idPost,
                 }
             })
 
             const user = await User.findByPk(idUser);
 
+            const post = await Post.findByPk(idPost);
+
             if(service.length == 0){
                 return res.status(401).send({Error: "Serviço não encontrado."})
             }
 
-            if(user.is_freelancer == true || service.is_from_client == 0){
+            if(user.is_freelancer == true){
+                return res.status(401).send({Error: "Você não pode efetuar este pagamento."})
+            }
+            else if(user.id != service.id_user && user.id != post.user_id){
                 return res.status(401).send({Error: "Você não pode efetuar este pagamento."})
             }
             
@@ -84,12 +92,30 @@ module.exports = {
             await mercadopago.createPreference(apiRequest)
 
             const preference = await mercadopago.preferences.create(apiRequest)
-            const updateServiceRating = await service.update({
-                rating
+            const updateService = await service.update({
+                rating,
+                feedback,
+                progress: 2
+            })
+
+            const balanceCalc = service.service_cost - (service.service_cost * 0.1);
+
+            let freelancer;
+            if(service.is_from_client == 1){
+                freelancer = post.user_id
+            }
+            else{
+                freelancer = service.id_user;
+            }
+
+            await BalanceRegister.create({
+                value: balanceCalc,
+                status_flow: "Cash",
+                id_freelancer: freelancer
             })
 
             res.status(200).send({
-                updateServiceRating,
+                updateService,
                 preference
             })
     

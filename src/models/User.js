@@ -34,6 +34,7 @@ class User extends Model{
         this.hasOne(models.Service, {foreignKey: "id_user"})
         this.hasMany(models.Post, {foreignKey: "user_id"})
         this.belongsToMany(models.Profession, {through: "user-profession"})
+        this.hasMany(models.BalanceRegister, {foreignKey: "id_freelancer"})
 
     }
 }

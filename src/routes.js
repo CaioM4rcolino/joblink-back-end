@@ -4,20 +4,21 @@ const routes = express.Router();
 const authMiddleware = require("./middleware/authorization");
 
 const middlewareClients = require('./middleware/clients');
-const middlewareFreelancers = require('./middleware/freelancers')
-const middlewarePosts = require('./middleware/posts')
+const middlewareFreelancers = require('./middleware/freelancers');
+const middlewarePosts = require('./middleware/posts');
+const middlewareServices = require('./middleware/services');
 const uploadFirebase = require('./services/uploadFirebase');
 const multerValidator = require('./middleware/multerValidator');
 
 const controllerFreelancers = require('./controllers/freelancers');
 const controllerClients = require('./controllers/clients');
 const controllerPosts = require('./controllers/posts');
-const controllerSessions = require('./controllers/sessions')
-const controllerSearching = require('./controllers/searching')
+const controllerSessions = require('./controllers/sessions');
+const controllerSearching = require('./controllers/searching');
 const controllerFeed = require('./controllers/feed');
 const controllerServices = require('./controllers/services');
 const controllerPayment = require('./controllers/payments');
-const controllerProfessions = require('./controllers/professions')
+const controllerProfessions = require('./controllers/professions');
 
 const mercadoPagoApi = require('./services/testPreference');
 
@@ -55,16 +56,16 @@ routes.delete("/posts/:id", controllerPosts.delete);
 
 //rota de serviços
 routes.get("/services", controllerServices.index);
-routes.post("/posts/:idPost/service", controllerServices.store);
+routes.post("/post/:idPost/service", controllerServices.store);
 //TODO: cliente dono da postagem e dono do token
-routes.post("/posts/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
-routes.delete("/posts/:idPost/service/:id", controllerServices.delete);
+routes.post("/post/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
+routes.delete("/post/:idPost/service/:id", controllerServices.delete);
 
 //setar preço do serviço (só para o freelancer)
-routes.put("/posts/:idPost/service/:id", controllerServices.update)
+routes.put("/post/:idPost/service/:id", controllerServices.update)
 
 //rota de pagamento (só para o cliente)
-routes.put("/payment/services/:id", controllerPayment.store);
+routes.put("/payment/post/:idPost/service/:id", middlewareServices.create, controllerPayment.store);
 
 //rota teste de preferencia 
 routes.post("/create_preference", mercadoPagoApi.createPreference);

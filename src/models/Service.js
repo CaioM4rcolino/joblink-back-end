@@ -10,6 +10,7 @@ class Service extends Model{
             is_from_client: DataTypes.TINYINT,
             service_cost: DataTypes.STRING,
             rating: DataTypes.STRING,
+            feedback: DataTypes.TEXT
 
             },
             {

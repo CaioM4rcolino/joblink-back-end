@@ -153,37 +153,33 @@ module.exports = {
                 return res.status(200).send(updateService)
             }
 
-            const user = await User.findByPk(idUser)
-
-            if(user.is_freelancer == false){
-                return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
-            }
-
-            const post = await validateModel(res, idPost, Post, "Postagem");
-
             const service = await Service.findOne({
                 where: {
                     id: idService,
                     id_post: idPost
                 }
             })
+            const post = await validateModel(res, idPost, Post, "Postagem");
+            const user = await User.findByPk(idUser)
+
 
             if(service == null || service == undefined){
                 return res.status(404).send({Error: "Serviço não encontrado."})
             }
 
-            if(post.is_announcement == true){
-                if(user.id != post.user_id){
-                    return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
-                }
-                else{
-                    updateServiceCost(service, service_cost, idService, idPost);
-                }
+            // if(service.service_cost != null || service.service_cost != ""){
+            //     return res.status(402).send({Error: "Você já determinou o preço do serviço."})
+            // }
+
+            if(user.is_freelancer == false){
+                return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
+            }
+            else if(user.id != service.id_user && user.id != post.user_id){
+                return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
             }
             else{
-              updateServiceCost(service, service_cost, idService, idPost);
+                updateServiceCost(service, service_cost, idService, idPost);
             }
-            
             
         } catch (error) {
             console.log(error)
