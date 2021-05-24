@@ -17,15 +17,15 @@ describe("Freelancers", () => {
 
     it("should create a freelancer", async () => {
         const response = await request(app).post("/freelancers").send({
-            name: "Ricardo Medeiros",
+            name: "Cleiton Neves",
             gender: "Masculino", 
-            birth_date: "12/03/1980",
-            email: "ricardomedeiros@gmail.com",
-            password: "ricardomedeiros",
-            profession: "5",
-            years_experience: "20 anos",
+            birth_date: "22/01/1981",
+            email: "cleitonneves@gmail.com",
+            password: "cleitonneves",
+            profession: "1",
+            years_experience: "10 anos",
             cpf: cpf.generate(),
-            address: "Avenida Panamericana, Danúbio do Sul"
+            address: "Avenida Jaraquara, Dakota Brasileira"
         })
 
         //console.log("Ó o freelancer", response.body.freelancer)
