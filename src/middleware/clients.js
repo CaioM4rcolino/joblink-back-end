@@ -30,10 +30,6 @@ module.exports = {
             banned: Joi.boolean(),
             address: Joi.string(),
             phone_number: Joi.string().pattern(/^\s*(\d{2}|\d{0})[-. ]?(\d{5}|\d{4})[-. ]?(\d{4})[-. ]?\s*$/)
-<<<<<<< HEAD
-
-=======
->>>>>>> feature/integration_tests
         })
     })
 }
