@@ -11,7 +11,7 @@ class Post extends Model{
             description: DataTypes.TEXT,
             image: DataTypes.STRING,
             urgency: DataTypes.INTEGER,
-            attendance: DataTypes.INTEGER,
+            attendance: DataTypes.STRING,
             is_announcement: DataTypes.TINYINT
 
            
