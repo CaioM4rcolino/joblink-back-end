@@ -27,6 +27,7 @@ routes.post("/clients", multerValidator, middlewareClients.create, uploadFirebas
 routes.post("/freelancers", multerValidator, middlewareFreelancers.create, uploadFirebase, controllerFreelancers.store);
 routes.get("/search", controllerSearching.find)
 
+
 //middleware que verifica o token
 routes.use(authMiddleware);
 

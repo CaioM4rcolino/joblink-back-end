@@ -10,7 +10,8 @@ module.exports = {
             urgency: Joi.number().integer().required(),
             attendance: Joi.number().integer().required(),
             is_announcement: Joi.boolean().required(),
-            category: Joi.string().required()
+            category: Joi.string().required(),
+            image: Joi.string().allow("")
         })
     }),
 
@@ -21,7 +22,8 @@ module.exports = {
             urgency: Joi.number().integer(),
             attendance: Joi.boolean(),
             is_announcement: Joi.boolean(),
-            category: Joi.string()
+            category: Joi.string(),
+            image: Joi.string().allow("")
         })
     })
 }
