@@ -20,6 +20,7 @@ const controllerServices = require('./controllers/services');
 const controllerPayment = require('./controllers/payments');
 const controllerProfessions = require('./controllers/professions');
 
+const googleMapsApi = require("./services/testGoogleMaps");
 const mercadoPagoApi = require('./services/testPreference');
 
 //rotas públicas
@@ -73,5 +74,9 @@ routes.post("/create_preference", mercadoPagoApi.createPreference);
 //rota de profissões
 routes.get("/professions", controllerProfessions.index)
 routes.get("/professions/:id", controllerProfessions.find)
+
+//rota para teste do Google Maps
+routes.post("/googlemaps/geolocation", googleMapsApi.geoLocation);
+routes.post("/googlemaps/geocoding", googleMapsApi.geoCoding);
 
 module.exports = routes;
