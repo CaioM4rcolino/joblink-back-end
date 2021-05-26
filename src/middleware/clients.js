@@ -8,7 +8,7 @@ module.exports = {
             email: Joi.string().min(8).max(255).required(),
             gender: Joi.string().max(11).required(),
             password: Joi.string().min(6).max(255).required(),
-            cpf: Joi.string().length(12).required(),
+            cpf: Joi.string().length(11).required(),
             image: Joi.string(),
             birth_date: Joi.string().pattern(/^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.]/).required(),
             address: Joi.string().required()
