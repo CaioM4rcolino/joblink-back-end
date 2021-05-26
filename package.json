@@ -4,6 +4,7 @@
   "description": "projeto joblink para encontrar e prestar serviços autônomos",
   "main": "app.js",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.1.16",
     "@types/jest": "^26.0.23",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
