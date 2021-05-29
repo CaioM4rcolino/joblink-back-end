@@ -2,47 +2,47 @@ const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
 const CONFIG = require("../config/maps-test-credentials.json")
 
-async function geoCoding() {
+async function geoCoding(req, res) {
+
+    const {address} = req.body;
 
     try {
 
-        const request = {
-            address: "Av. Anibal Correa"
-        }
-
-        console.log(await client.geocode({
-            params: {
-                address: "Av. Anibal Correa",
-                key: CONFIG.access_key
+        const geocoding = await client.geocode(
+            {
+                params:{
+                    address: address,
+                    key: CONFIG.access_key
+                }, 
+                
             }
-        }));
+        );
+
+
+         res.status(200).send(geocoding.data)
 
 
     } catch (error) {
         console.log(error)
+        res.status(500).send(error)
     }
 }
 
-async function geoLocation(){
+async function geoLocation(req, res){
     try {
         
-        console.log(await client.geolocate({
+        const geolocation = await client.geolocate({
             params:{
-                cellTowers: [
-                    {
-                      cellId: 945724884,
-                      mobileCountryCode: 11,
-                    }
-                  ],
-                considerIp: false,
+                considerIp: true,
                 key: CONFIG.access_key
             }
-        }))
+        })
 
-        //nota: está retornado 404 
+        res.status(200).send(geolocation.data)
 
     } catch (error) {
         console.log(error)
+        res.status(500).send(error)
     }
 }
 
