@@ -22,6 +22,7 @@ const controllerProfessions = require('./controllers/professions');
 
 const googleMapsApi = require("./services/testGoogleMaps");
 const mercadoPagoApi = require('./services/testPreference');
+const oneSidedRequest = require('./controllers/oneSidedServiceRequest');
 
 //rotas públicas
 routes.post("/sessions", controllerSessions.store);
@@ -58,8 +59,10 @@ routes.delete("/posts/:id", controllerPosts.delete);
 //rota de serviços
 routes.get("/services", controllerServices.index);
 routes.post("/post/:idPost/service", controllerServices.store);
+
 //TODO: cliente dono da postagem e dono do token
-routes.post("/post/:idPost/freelancer/:idFreelancer/service", controllerServices.store);
+routes.post("/post/:idPost/freelancer/:idFreelancer/service", oneSidedRequest.create);
+
 routes.delete("/post/:idPost/service/:id", controllerServices.delete);
 
 //setar preço do serviço (só para o freelancer)
