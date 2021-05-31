@@ -20,7 +20,8 @@ const controllerServices = require('./controllers/services');
 const controllerPayment = require('./controllers/payments');
 const controllerProfessions = require('./controllers/professions');
 
-const googleMapsApi = require("./services/testGoogleMaps");
+const googleMapsApiTests = require("./services/testGoogleMaps");
+const googleMapsApi = require("./services/googleMaps")
 const mercadoPagoApi = require('./services/testPreference');
 const oneSidedRequest = require('./controllers/oneSidedServiceRequest');
 
@@ -79,9 +80,9 @@ routes.get("/professions", controllerProfessions.index)
 routes.get("/professions/:id", controllerProfessions.find)
 
 //rota para teste do Google Maps
-routes.post("/googlemaps/geolocation", googleMapsApi.geoLocation);
-routes.post("/googlemaps/geocoding", googleMapsApi.geoCoding);
+routes.post("/googlemaps/geolocation", googleMapsApiTests.geoLocation);
+routes.post("/googlemaps/geocoding", googleMapsApiTests.geoCoding);
 
-routes.post("/getCloseFreelancers/post/:id")
+routes.get("/getNearFreelancers", googleMapsApi.getFreelancersByLocation)
 
 module.exports = routes;
