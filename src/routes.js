@@ -82,4 +82,6 @@ routes.get("/professions/:id", controllerProfessions.find)
 routes.post("/googlemaps/geolocation", googleMapsApi.geoLocation);
 routes.post("/googlemaps/geocoding", googleMapsApi.geoCoding);
 
+routes.post("/getCloseFreelancers/post/:id")
+
 module.exports = routes;
