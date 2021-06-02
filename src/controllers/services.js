@@ -113,6 +113,7 @@ module.exports = {
                         id_post: idPost,
                         is_from_client: true,
                         progress: 1,
+                        is_accepted: 0
                     })
 
                     return res.status(201).send(service);
