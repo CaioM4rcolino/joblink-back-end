@@ -12,14 +12,14 @@ module.exports = {
                 include:[
                     {
                         association: "User",
-                        attributes: ["name"]
-                    },
+                        attributes: ["id", "name"]
+                    },  
                     {
                         association: "Post",
                         attributes: ["id", "title", "description"],
                         include:{
                             association: "User",
-                            attributes: ["name"]
+                            attributes: ["id", "name"]
                         }
                     }
                     
@@ -71,6 +71,7 @@ module.exports = {
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
+                        id_freelancer: null,
                         is_from_client: true,
                         progress: 1,
                     })
@@ -93,10 +94,15 @@ module.exports = {
                         id_post: idPost,
                         id_user: idUser
                     }})
+
+                    if(queryServices.length != 0){
+                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
+                    }
                 
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
+                        id_freelancer: null,
                         is_from_client: false,
                         progress: 1,
                     })
@@ -111,6 +117,7 @@ module.exports = {
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
+                        id_freelancer: null,
                         is_from_client: true,
                         progress: 1,
                     })

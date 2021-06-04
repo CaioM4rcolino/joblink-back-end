@@ -30,6 +30,7 @@ async function create(req, res){
                 {Not_acceptable: "Você não pode requisitar um serviço à um cliente."}
                 )
         }
+
         if(idUser != post.user_id){
             return res.status(401).send({Unauthorized: "Você não é o dono desta postagem."})
         }
@@ -38,6 +39,7 @@ async function create(req, res){
             const service = await Service.create({
                 id_user: post.user_id,
                 id_post: post.id,
+                id_freelancer: idFreelancer,
                 is_from_client: true,
                 progress: 1
             })
@@ -47,9 +49,6 @@ async function create(req, res){
                     id: service.id
                 }
             })
-
-            //PROBLEMA: NENHUMA RELAÇÃO EXPLÍCITA COM O FREELANCER REQUISITADO. NÃO TEM COMO ENCONTRÁ-LO
-
             return res.status(201).send(getCreatedService)
         }
         else{

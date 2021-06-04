@@ -23,6 +23,7 @@ class Service extends Model{
     static associate(models){
         this.sequelize
         this.belongsTo(models.User, {foreignKey: "id_user"});
+        this.belongsTo(models.User, {foreignKey: "id_freelancer"})
         this.belongsTo(models.Post, {foreignKey: "id_post"});
 
     }
