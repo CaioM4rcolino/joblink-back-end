@@ -1,20 +1,59 @@
 const Chat = require("../models/Chat");
 const Message = require("../models/Message");
-const { getPayload } = require("../utils");
+const { getPayload, validateModel } = require("../utils");
 const Service = require("../models/Service");
 const Post = require("../models/Post");
 const User = require("../models/User");
 module.exports = {
+
+    async index(req, res){
+
+        try {
+
+            const chats = await Chat.findAll({
+                attributes: ["id", "created_at", "updated_at"],
+                include:{
+                    association: "Service",
+                    include:[
+                        {
+                            association: "User",
+                            attributes: ["name"]
+                        },
+                        {
+                            association: "Post",
+                            attributes: ["id", "title", "description"],
+                            include:{
+                                association: "User",
+                                attributes: ["name"]
+                            }
+                        }
+                    ]
+                }
+            });
+
+            if(chats.length == 0){
+                return res.status(404).send({No_results: "0 chats encontrados."})
+            }
+
+            res.status(200).send(chats)
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
+    },
     async store(req,res){
 
         const idService = req.params.id;
 
         try {
            
-            await Chat.create({id_service: idService});
 
-            const service = await Service.findByPk(idService);
-            const post = await Post.findByPk(service.id_post);
+            const service = await validateModel(res, idService, Service, "Serviço");
+            const post = await validateModel(res, service.id_post, Post, "Postagem");
+
+            await Chat.create({id_service: service.id});
+
 
             let idClient = "";
             let idFreelancer = "";
@@ -32,8 +71,8 @@ module.exports = {
                     }
             }
             
-            const client = await User.findByPk(idClient);
-            const freelancer = await User.findByPk(idFreelancer);
+            const client = await validateModel(res, idClient, User, "Cliente");
+            const freelancer = await validateModel(res, idFreelancer, User, "Freelancer");
 
             res.status(200).send({Success: "Chat criado com sucesso.", Involved:{
                 client: client.name,
@@ -55,6 +94,9 @@ module.exports = {
         const {description} = req.body;
 
         try {
+
+            const chat = await validateModel(res, idChat, Chat, "Chat")
+            const service = await validateModel(res, chat.id_service, Service, "Serviço")
            
             await Message.create({
                 where:{

@@ -19,6 +19,7 @@ class Chat extends Model{
     static associate(models){
         this.sequelize
         this.hasMany(models.Message, {foreignKey: "id_chat"})
+        this.belongsTo(models.Service, {foreignKey: "id_service"})
 
     }
 }

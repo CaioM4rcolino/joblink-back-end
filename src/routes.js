@@ -86,6 +86,7 @@ routes.post("/googlemaps/geocoding", googleMapsApiTests.geoCoding);
 
 routes.get("/getNearFreelancers", googleMapsApi.getFreelancersByLocation);
 
+routes.get("/chats", controllerChat.index)
 routes.post("/createChat/service/:id", controllerChat.store)
 routes.post("/chat/:id/message", controllerChat.update)
 

@@ -10,6 +10,7 @@ class Service extends Model{
             is_from_client: DataTypes.TINYINT,
             service_cost: DataTypes.STRING,
             rating: DataTypes.STRING,
+            is_accepted: DataTypes.TINYINT,
             feedback: DataTypes.TEXT
 
             },
@@ -24,6 +25,7 @@ class Service extends Model{
         this.sequelize
         this.belongsTo(models.User, {foreignKey: "id_user"});
         this.belongsTo(models.Post, {foreignKey: "id_post"});
+        this.hasMany(models.Chat, {foreignKey: "id_service"});
 
     }
 }
