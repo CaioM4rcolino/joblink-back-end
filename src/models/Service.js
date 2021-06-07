@@ -9,6 +9,7 @@ class Service extends Model{
             progress: DataTypes.STRING,
             is_from_client: DataTypes.TINYINT,
             service_cost: DataTypes.STRING,
+            is_accepted: DataTypes.TINYINT,
             rating: DataTypes.STRING,
             feedback: DataTypes.TEXT
 

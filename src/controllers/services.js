@@ -2,6 +2,7 @@ const Service = require("../models/Service");
 const Post = require("../models/Post");
 const User = require("../models/User");
 const {validateModel, getPayload} = require("../utils");
+const { Op } = require("sequelize");
 
 module.exports = {
     
@@ -9,10 +10,12 @@ module.exports = {
         try {
 
             const queryServices = await Service.findAll({
+                subQuery,
                 include:[
                     {
                         association: "User",
-                        attributes: ["id", "name"]
+                        attributes: ["id", "name"],
+                        
                     },  
                     {
                         association: "Post",
@@ -71,6 +74,7 @@ module.exports = {
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
+                        is_accepted: false,
                         id_freelancer: null,
                         is_from_client: true,
                         progress: 1,
@@ -102,6 +106,7 @@ module.exports = {
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
+                        is_accepted: false,
                         id_freelancer: null,
                         is_from_client: false,
                         progress: 1,
@@ -117,6 +122,7 @@ module.exports = {
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
+                        is_accepted: false,
                         id_freelancer: null,
                         is_from_client: true,
                         progress: 1,
