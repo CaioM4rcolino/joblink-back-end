@@ -52,7 +52,8 @@ module.exports = {
             const service = await validateModel(res, idService, Service, "Serviço");
             const post = await validateModel(res, service.id_post, Post, "Postagem");
 
-            await Chat.create({id_service: service.id});
+            if(service.progress == 1)
+                await Chat.create({id_service: service.id});
 
 
             let idClient = "";

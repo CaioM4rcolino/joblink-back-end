@@ -12,14 +12,14 @@ module.exports = {
                 include:[
                     {
                         association: "User",
-                        attributes: ["name"]
+                        attributes: ["id", "name"]
                     },
                     {
                         association: "Post",
                         attributes: ["id", "title", "description"],
                         include:{
                             association: "User",
-                            attributes: ["name"]
+                            attributes: ["id", "name"]
                         }
                     }
                     
@@ -27,7 +27,10 @@ module.exports = {
                 
             })
 
-            res.status(200).send(queryServices)
+            if(queryServices.length != 0)
+                res.status(200).send(queryServices)
+            else
+                res.status(404).send({No_results: "0 serviços encontrados."})
             
         } catch (error) {
             console.log(error)
@@ -61,7 +64,6 @@ module.exports = {
 
                     const queryServices = await Service.findAll({where:{
                         id_post: idPost,
-                        id_user: idUser
                     }})
 
                     if(queryServices.length != 0){
@@ -93,13 +95,17 @@ module.exports = {
 
                     const queryServices = await Service.findAll({where:{
                         id_post: idPost,
-                        id_user: idUser
                     }})
+
+                    if(queryServices.length != 0){
+                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
+                    }
                 
                     const service = await Service.create({
                         id_user: idUser,
                         id_post: idPost,
                         is_from_client: false,
+                        is_accepted: false,
                         progress: 1,
                     })
 
@@ -114,8 +120,8 @@ module.exports = {
                         id_user: idUser,
                         id_post: idPost,
                         is_from_client: true,
+                        is_accepted: false,
                         progress: 1,
-                        is_accepted: 0
                     })
 
                     return res.status(201).send(service);
@@ -205,9 +211,14 @@ module.exports = {
             const post = await validateModel(res, idPost, Post, "Postagem")
 
             if(service.id_user == idUser || post.user_id == idUser){
+                if(service.id_post == post.id){
+                    await Service.destroy({where:{id: idService}})
+                    return res.status(200).send({Success: "Serviço deletado com sucesso."})
+                }
+                else{
+                    return res.status(404).send({Not_found: "Serviço ou postagem inválidos."})
+                }
 
-                await Service.destroy({where:{id: idService}})
-                return res.status(200).send({Success: "Serviço deletado com sucesso."})
             }
             else{
                 return res.status(401).send({Unauthorized: "Você não pode deletar este serviço."})
