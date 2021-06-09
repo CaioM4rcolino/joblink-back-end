@@ -12,7 +12,13 @@ module.exports = {
                 include:[
                     {
                         association: "User",
-                        attributes: ["id", "name"]
+                        attributes: ["id", "name"],
+                        
+                    },
+                    {
+                        association: "Freelancer",
+                        attributes: ["id", "name"],
+                        
                     },
                     {
                         association: "Post",
