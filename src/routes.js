@@ -20,6 +20,7 @@ const controllerServices = require('./controllers/services');
 const controllerPayment = require('./controllers/payments');
 const controllerProfessions = require('./controllers/professions');
 const controllerChat = require("./controllers/chat");
+const controllerMessages = require("./controllers/messages")
 const controllerNotifications = require('./controllers/notifications')
 
 const googleMapsApiTests = require("./services/testGoogleMaps");
@@ -87,9 +88,13 @@ routes.post("/googlemaps/geocoding", googleMapsApiTests.geoCoding);
 
 routes.get("/getNearFreelancers", googleMapsApi.getFreelancersByLocation);
 
+//rotas dos chats
 routes.get("/chats", controllerChat.index)
 routes.post("/createChat/service/:id", controllerChat.store)
-routes.post("/chat/:id/message", controllerChat.update)
+
+//rotas das mensagens
+routes.get("/chat/:id/messages", controllerMessages.index);
+routes.post("/service/:idService/chat/:id/message", controllerMessages.store)
 
 routes.get("/notifications", controllerNotifications.index)
 

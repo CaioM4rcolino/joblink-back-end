@@ -4,7 +4,7 @@ const { getPayload, validateModel } = require("../utils");
 const Service = require("../models/Service");
 const Post = require("../models/Post");
 const User = require("../models/User");
-const { findAll } = require("../models/Service");
+
 module.exports = {
 
     async index(req, res){
@@ -106,33 +106,6 @@ module.exports = {
                     name: freelancer.name   
                 } 
             }})
-
-        } catch (error) {
-            console.log(error)
-            res.status(500).send(error)
-        }
-    },
-
-    async update(req,res){
-
-        const idChat = req.params.id;
-        const payload = getPayload(req)
-        const idUser = Object.values(payload)[0]
-
-        const {description} = req.body;
-
-        try {
-
-            const chat = await validateModel(res, idChat, Chat, "Chat")
-            const service = await validateModel(res, chat.id_service, Service, "Serviço")
-           
-            await Message.create({
-                where:{
-                    id_chat: idChat,
-                    message_description: description,
-                    message_author: idUser
-                }
-            })
 
         } catch (error) {
             console.log(error)
