@@ -63,7 +63,7 @@ module.exports = {
                     })
                 }
                 else{
-                    res.status(404).send({No_Results: "Você não tem notificações."})
+                    res.status(200).send({No_Results: "Você não tem notificações."})
                 }
             
 

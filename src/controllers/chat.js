@@ -4,14 +4,60 @@ const { getPayload, validateModel } = require("../utils");
 const Service = require("../models/Service");
 const Post = require("../models/Post");
 const User = require("../models/User");
+const { find } = require("./freelancers");
 
 module.exports = {
 
     async index(req, res){
 
+        const payload = getPayload(req)
+        const idUser = Object.values(payload)[0]
+
+        try {
+
+            let chats = await Chat.findAll({
+                attributes: ["id", "created_at", "updated_at"],
+                include:{
+                    association: "Service",
+                    include:[
+                        {
+                            association: "User",
+                            attributes: ["id", "name"]
+                        },
+                        {
+                            association: "Post",
+                            attributes: ["id", "title", "description"],
+                            include:{
+                                association: "User",
+                                attributes: ["id", "name"]
+                            }
+                        }
+                    ]
+                }
+            });
+
+            if(chats.length == 0){
+                return res.status(404).send({No_results: "0 chats encontrados."})
+            }
+
+        
+
+            res.status(200).send(chats)
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
+    },
+
+    async find(req, res){
+
+        const idChat = req.params.id;
+        
         try {
 
             const chats = await Chat.findAll({
+                where:{id: idChat},
                 attributes: ["id", "created_at", "updated_at"],
                 include:{
                     association: "Service",
