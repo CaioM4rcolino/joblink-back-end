@@ -90,7 +90,6 @@ routes.get("/getNearFreelancers", googleMapsApi.getFreelancersByLocation);
 
 //rotas dos chats
 routes.get("/chats", controllerChat.index);
-routes.get("/chats/:id", controllerChat.find);
 routes.post("/createChat/service/:id", controllerChat.store)
 
 //rotas das mensagens

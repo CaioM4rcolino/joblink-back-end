@@ -4,7 +4,7 @@ const { getPayload, validateModel } = require("../utils");
 const Service = require("../models/Service");
 const Post = require("../models/Post");
 const User = require("../models/User");
-const { find } = require("./freelancers");
+const { Op } = require("sequelize");
 
 module.exports = {
 
@@ -15,74 +15,76 @@ module.exports = {
 
         try {
 
-            let chats = await Chat.findAll({
+            let query1 = await Chat.findAll({
                 attributes: ["id", "created_at", "updated_at"],
                 include:{
                     association: "Service",
+                    where:{
+                        [Op.or]:[
+                            {id_user: idUser},
+                            {id_freelancer: idUser}
+                        ]
+                    },
                     include:[
                         {
                             association: "User",
                             attributes: ["id", "name"]
+                            
                         },
                         {
                             association: "Post",
-                            attributes: ["id", "title", "description"],
-                            include:{
-                                association: "User",
-                                attributes: ["id", "name"]
-                            }
+                            attributes: ["id", "title", "description"]
                         }
                     ]
                 }
             });
-
-            if(chats.length == 0){
-                return res.status(404).send({No_results: "0 chats encontrados."})
-            }
-
-        
-
-            res.status(200).send(chats)
             
-        } catch (error) {
-            console.log(error)
-            res.status(500).send(error)
-        }
-    },
-
-    async find(req, res){
-
-        const idChat = req.params.id;
-        
-        try {
-
-            const chats = await Chat.findAll({
-                where:{id: idChat},
+            let query2 = await Chat.findAll({
                 attributes: ["id", "created_at", "updated_at"],
                 include:{
                     association: "Service",
                     include:[
                         {
-                            association: "User",
-                            attributes: ["name"]
-                        },
-                        {
                             association: "Post",
                             attributes: ["id", "title", "description"],
+                            where:{
+                                user_id: idUser
+                            },
                             include:{
                                 association: "User",
-                                attributes: ["name"]
+                                attributes: ["id", "name"]
                             }
+                        },
+                        {
+                            association: "User",
+                            attributes: ["id", "name"]
                         }
                     ]
                 }
-            });
+            })
 
-            if(chats.length == 0){
-                return res.status(404).send({No_results: "0 chats encontrados."})
+            if(query1.length != 0 || query2.length != 0){
+
+                function verifyService(chat){
+                    if(chat.Service != null){
+                        return chat
+                    }
+                }
+
+                let queryChatsByService = query1.filter(verifyService)
+                let queryChatsByPosts = query2.filter(verifyService)
+
+                //return console.log(queryChatByPosts)
+
+                return res.status(200).send({
+                    queryChatsByService,
+                    queryChatsByPosts
+                })
+            }
+            else{
+                return res.status(200).send({No_results: "0 resultados encontrados."})
             }
 
-            res.status(200).send(chats)
             
         } catch (error) {
             console.log(error)
