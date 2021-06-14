@@ -16,7 +16,12 @@ module.exports = {
                         association: "User",
                         attributes: ["id", "name"],
                         
-                    },  
+                    },
+                    {
+                        association: "Freelancer",
+                        attributes: ["id", "name"],
+                        
+                    },
                     {
                         association: "Post",
                         attributes: ["id", "title", "description"],
@@ -30,7 +35,10 @@ module.exports = {
                 
             })
 
-            res.status(200).send(queryServices)
+            if(queryServices.length != 0)
+                res.status(200).send(queryServices)
+            else
+                res.status(404).send({No_results: "0 serviços encontrados."})
             
         } catch (error) {
             console.log(error)
@@ -64,7 +72,6 @@ module.exports = {
 
                     const queryServices = await Service.findAll({where:{
                         id_post: idPost,
-                        id_user: idUser
                     }})
 
                     if(queryServices.length != 0){
@@ -77,7 +84,9 @@ module.exports = {
                         is_accepted: false,
                         id_freelancer: null,
                         is_from_client: true,
+                        is_accepted: false,
                         progress: 1,
+                        
                     })
 
                     return res.status(201).send(service);
@@ -96,7 +105,6 @@ module.exports = {
 
                     const queryServices = await Service.findAll({where:{
                         id_post: idPost,
-                        id_user: idUser
                     }})
 
                     if(queryServices.length != 0){
@@ -109,6 +117,7 @@ module.exports = {
                         is_accepted: false,
                         id_freelancer: null,
                         is_from_client: false,
+                        is_accepted: false,
                         progress: 1,
                     })
 
@@ -125,6 +134,7 @@ module.exports = {
                         is_accepted: false,
                         id_freelancer: null,
                         is_from_client: true,
+                        is_accepted: false,
                         progress: 1,
                     })
 
@@ -215,9 +225,14 @@ module.exports = {
             const post = await validateModel(res, idPost, Post, "Postagem")
 
             if(service.id_user == idUser || post.user_id == idUser){
+                if(service.id_post == post.id){
+                    await Service.destroy({where:{id: idService}})
+                    return res.status(200).send({Success: "Serviço deletado com sucesso."})
+                }
+                else{
+                    return res.status(404).send({Not_found: "Serviço ou postagem inválidos."})
+                }
 
-                await Service.destroy({where:{id: idService}})
-                return res.status(200).send({Success: "Serviço deletado com sucesso."})
             }
             else{
                 return res.status(401).send({Unauthorized: "Você não pode deletar este serviço."})

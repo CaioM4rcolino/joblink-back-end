@@ -12,7 +12,7 @@ async function create(req, res){
     const idFreelancer = req.params.idFreelancer;
 
     try {
-        
+
         const queryServices = await Service.findAll({where:{
             id_post: idPost,
             id_user: idUser
@@ -25,31 +25,28 @@ async function create(req, res){
         const post = await validateModel(res, idPost, Post, "Postagem");
         const freelancer = await validateModel(res, idFreelancer, User, "Freelancer");
 
+        if(idUser != post.user_id){
+            return res.status(401).send({Unauthorized: "Você não é o dono desta postagem."})
+        }
+
         if(freelancer.is_freelancer == false){
             return res.status(406).send(
                 {Not_acceptable: "Você não pode requisitar um serviço à um cliente."}
                 )
         }
-
-        if(idUser != post.user_id){
-            return res.status(401).send({Unauthorized: "Você não é o dono desta postagem."})
-        }
         
         if(post.is_announcement == false){
             const service = await Service.create({
-                id_user: post.user_id,
+                id_user: idUser,
+                id_freelancer: idFreelancer,
                 id_post: post.id,
                 id_freelancer: idFreelancer,
                 is_from_client: true,
-                progress: 1
+                progress: 1,
+                is_accepted: 0
             })
 
-            const getCreatedService = await Service.findOne({
-                where:{
-                    id: service.id
-                }
-            })
-            return res.status(201).send(getCreatedService)
+            return res.status(201).send(service)
         }
         else{
             return res.status(406).send({Error: "Você está anunciando um serviço, portanto não pode contratar um freelancer."})

@@ -7,14 +7,15 @@ const generateToken = (payload) => {
     });
 };
 
-const validateModel = (res, id, Model, modelName) => {
+const validateModel = async (res, id, Model, modelName) => {
 
-    const model = Model.findByPk(id)
-
-    if(model == null || model == undefined)
+    const model = await Model.findByPk(id)
+    if(model == null || model == undefined){
         return res.status(404).send({Error: `${modelName} não encontrado(a).`})
-    else
-        return model;    
+    }
+    else{
+        return model;  
+    }  
     
 }
 

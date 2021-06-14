@@ -113,6 +113,7 @@ module.exports = {
             res.status(201).send({
                 Status: "Success",
                 post:{
+                    id: post.id,
                     author: author.name,
                     title: post.title,
                     description: post.description,
@@ -136,7 +137,8 @@ module.exports = {
             description, 
             urgency, 
             image, 
-            is_announcement
+            is_announcement,
+            attendance
         } = req.body;
 
         const idPost = req.params.id;
@@ -170,7 +172,8 @@ module.exports = {
                         description,
                         urgency,
                         image,
-                        is_announcement
+                        is_announcement,
+                        attendance
                     },
                     {
                         where:{
