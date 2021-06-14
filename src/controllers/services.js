@@ -10,7 +10,6 @@ module.exports = {
         try {
 
             const queryServices = await Service.findAll({
-                subQuery,
                 include:[
                     {
                         association: "User",
