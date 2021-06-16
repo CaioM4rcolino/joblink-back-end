@@ -21,7 +21,7 @@ module.exports = {
         const idPost = req.params.idPost;
         const idUser = Object.values(payload)[0];
 
-        const{payment_methods, rating, feedback} = req.body;
+        const{payment_methods} = req.body;
 
         try {
 
@@ -34,7 +34,20 @@ module.exports = {
 
             const user = await User.findByPk(idUser);
 
-            const post = await Post.findByPk(idPost);
+            const post = await Post.findByPk(idPost, {
+                include: {
+                    association: "Categories",
+                    attributes: ["id", "name"]
+                }
+            });
+
+            const categories = post.Categories.map(c => c.dataValues.name).join();
+
+            //   for (let assoc of Object.keys(Post.associations)) {
+            //     for (let accessor of Object.keys(Post.associations[assoc].accessors)) {
+            //         console.log(Post.name + '.' + Post.associations[assoc].accessors[accessor] + '()');
+            //     }
+            // }
 
             if(service.length == 0){
                 return res.status(401).send({Error: "Serviço não encontrado."})
@@ -58,6 +71,7 @@ module.exports = {
                 user_phone_area_code = user.phone_number.substring(0, 2);
             }
          
+          
             
             //resgatar o número da rua em um endereço variável
             // var regex = /\d+/;
@@ -82,6 +96,7 @@ module.exports = {
                 },
                 items:[
                     {
+                        title: categories,
                         quantity: 1,
                         unit_price: Number(service.service_cost)
                     }
@@ -92,12 +107,7 @@ module.exports = {
             await mercadopago.createPreference(apiRequest)
 
             const preference = await mercadopago.preferences.create(apiRequest)
-            const updateService = await service.update({
-                rating,
-                feedback,
-                progress: 2
-            })
-
+            
             const balanceCalc = service.service_cost - (service.service_cost * 0.1);
 
             let freelancer;
@@ -107,13 +117,36 @@ module.exports = {
             else{
                 freelancer = service.id_user;
             }
-
-            await BalanceRegister.create({
-                value: balanceCalc,
-                status_flow: "Cash",
-                id_freelancer: freelancer
+            
+            const balanceRegister = await BalanceRegister.findOne({
+                where:{
+                    id_service: idService
+                }
             })
+           
+            if(balanceRegister != null){
+                await balanceRegister.update({
+                    value: balanceCalc,
+                    status_flow: "Cash",
+                    id_freelancer: freelancer,
+                    where:{
+                        id_service: idService
+                    }
+                })
+            }
+            else{
+                await BalanceRegister.create({
+                    value: balanceCalc,
+                    status_flow: "Cash",
+                    id_freelancer: freelancer,
+                    id_service: idService
+                })
+            }
+           
 
+            const updateService = await service.update({
+                progress: 2
+            })
             res.status(200).send({
                 updateService,
                 preference

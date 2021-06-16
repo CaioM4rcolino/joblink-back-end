@@ -26,6 +26,10 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true
         },
+        feedback:{
+          type: Sequelize.TEXT,
+          allowNull:true
+        },
         id_user:{
             type: Sequelize.INTEGER,
             references:{
@@ -45,6 +49,16 @@ module.exports = {
             onUpdate: "CASCADE",
             onDelete: "CASCADE",
             allowNull:false
+        },
+        id_freelancer:{
+          type: Sequelize.INTEGER,
+          references:{
+            model: "users", 
+            key: "id"
+          },
+          onUpdate: "CASCADE",
+          onDelete: "CASCADE",
+          allowNull:true
         },
         created_at:{
           type: Sequelize.DATE,

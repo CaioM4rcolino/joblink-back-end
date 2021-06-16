@@ -22,6 +22,7 @@ const controllerProfessions = require('./controllers/professions');
 const controllerChat = require("./controllers/chat");
 const controllerMessages = require("./controllers/messages")
 const controllerNotifications = require('./controllers/notifications')
+const controllerFeedback = require('./controllers/feedback')
 
 const googleMapsApiTests = require("./services/testGoogleMaps");
 const googleMapsApi = require("./services/googleMaps")
@@ -74,6 +75,9 @@ routes.put("/post/:idPost/service/:id", controllerServices.update)
 
 //rota de pagamento (só para o cliente)
 routes.put("/payment/post/:idPost/service/:id", middlewareServices.create, controllerPayment.store);
+
+//rota de avaliação
+routes.put("/feedback/post/:idPost/service/:id", controllerFeedback.update)
 
 //rota teste de preferencia 
 routes.post("/create_preference", mercadoPagoApi.createPreference);

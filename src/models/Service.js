@@ -28,7 +28,7 @@ class Service extends Model{
         this.belongsTo(models.User, {foreignKey: "id_freelancer", as: "Freelancer"});
         this.belongsTo(models.Post, {foreignKey: "id_post"});
         this.hasMany(models.Chat, {foreignKey: "id_service"});
-
+        this.hasMany(models.BalanceRegister, {foreignKey: "id_service"})
     }
 }
 

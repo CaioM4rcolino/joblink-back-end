@@ -21,6 +21,7 @@ class BalanceRegister extends Model{
     static associate(models){
         
         this.belongsTo(models.User, {foreignKey: "id_freelancer"})
+        this.belongsTo(models.Service, {foreignKey: "id_service"})
     }
 }
 
