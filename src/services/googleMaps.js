@@ -9,6 +9,8 @@ async function getFreelancersByLocation(req, res) {
     const payload = getPayload(req);
     const idUser = Object.values(payload)[0];
 
+    const idProfession = req.params.id;
+
     try {
 
         const user = await validateModel(res, idUser, User, "Usuário");
@@ -22,12 +24,37 @@ async function getFreelancersByLocation(req, res) {
         })
 
         //varredura dos endereços de todos os freelancers do banco
-        const allUsers = await User.findAll({
-            attributes: ["id", "name", "address"],
-            where: {
-                is_freelancer: true
-            }
-        })
+        let allUsers;
+        if(req.route.path == "/getNearFreelancers/profession/:id"){
+            allUsers = await User.findAll({
+                attributes: ["id", "name", "address"],
+                include: {
+                    association: "Professions",
+                    through: {attributes: [] },
+                    attributes: ["id", "name"],
+                    where:{
+                        id: idProfession
+                    }     
+                },
+                where: {
+                    is_freelancer: true
+                }
+            })
+        }
+        else{
+            allUsers = await User.findAll({
+                attributes: ["id", "name", "address"],
+                include: {
+                    association: "Professions",
+                    through: {attributes: [] },
+                    attributes: ["id", "name"]    
+                },
+                where: {
+                    is_freelancer: true
+                }
+            })
+        }
+     
 
         //geocodificação do endereço de todos os freelancers do banco
         const promises = allUsers.map(async (u) => {

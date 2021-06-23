@@ -117,6 +117,7 @@ routes.post("/googlemaps/geolocation", googleMapsApiTests.geoLocation);
 routes.post("/googlemaps/geocoding", googleMapsApiTests.geoCoding);
 
 routes.get("/getNearFreelancers", googleMapsApi.getFreelancersByLocation);
+routes.get("/getNearFreelancers/profession/:id", googleMapsApi.getFreelancersByLocation);
 
 //rotas dos chats
 routes.get("/chats", controllerChat.index);
