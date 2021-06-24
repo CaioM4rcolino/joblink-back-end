@@ -99,7 +99,7 @@ module.exports = {
             },
             {
               association: "Post",
-              attributes: ["id", "title", "description"],
+              attributes: ["id", "title", "description", "is_annoucement"],
               include: {
                 association: "User",
                 attributes: ["id", "name"],
