@@ -2,7 +2,7 @@ const { errors } = require("celebrate");
 const express = require('express');
 
 const cors = require("cors");
-require('./database');
+require("./database");
 
 const app = express();
 const routes = require('./routes');

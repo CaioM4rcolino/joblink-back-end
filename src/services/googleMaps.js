@@ -1,6 +1,6 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
-const CONFIG = require("../config/maps-test-credentials.json");
+const CONFIG = require("../config/maps-test-credentials.js");
 const { getPayload, validateModel, haversine} = require('../utils');
 const User = require('../models/User');
 

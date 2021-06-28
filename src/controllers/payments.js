@@ -1,5 +1,5 @@
 var mercadopago = require('mercadopago');
-const config = require("../config/mp-test-credentials.json");
+const config = require("../config/mp-test-credentials.js");
 const User = require("../models/User");
 const Service = require("../models/Service");
 const {getPayload} = require("../utils");
