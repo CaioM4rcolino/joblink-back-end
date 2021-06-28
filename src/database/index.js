@@ -12,7 +12,7 @@ const BalanceRegister = require("../models/BalanceRegister")
 const Chat = require("../models/Chat")
 const Message = require("../models/Message")
 
-const connection = new Sequelize(dbConfig);
+const connection = new Sequelize(dbConfig.url, dbConfig.config);
 
 User.init(connection)
 Client.init(connection);
