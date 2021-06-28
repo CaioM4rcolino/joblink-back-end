@@ -1,40 +1,54 @@
-const express = require('express');
+const express = require("express");
 const routes = express.Router();
 
 const authMiddleware = require("./middleware/authorization");
 
-const middlewareClients = require('./middleware/clients');
-const middlewareFreelancers = require('./middleware/freelancers');
-const middlewarePosts = require('./middleware/posts');
-const middlewareServices = require('./middleware/services');
-const uploadFirebase = require('./services/uploadFirebase');
-const multerValidator = require('./middleware/multerValidator');
+const middlewareClients = require("./middleware/clients");
+const middlewareFreelancers = require("./middleware/freelancers");
+const middlewarePosts = require("./middleware/posts");
+const middlewareServices = require("./middleware/services");
+const uploadFirebase = require("./services/uploadFirebase");
+const multerValidator = require("./middleware/multerValidator");
 
-const controllerFreelancers = require('./controllers/freelancers');
-const controllerClients = require('./controllers/clients');
-const controllerPosts = require('./controllers/posts');
-const controllerSessions = require('./controllers/sessions');
-const controllerSearching = require('./controllers/searching');
-const controllerFeed = require('./controllers/feed');
-const controllerServices = require('./controllers/services');
-const controllerPayment = require('./controllers/payments');
-const controllerProfessions = require('./controllers/professions');
+const controllerFreelancers = require("./controllers/freelancers");
+const controllerClients = require("./controllers/clients");
+const controllerPosts = require("./controllers/posts");
+const controllerSessions = require("./controllers/sessions");
+const controllerSearching = require("./controllers/searching");
+const controllerFeed = require("./controllers/feed");
+const controllerServices = require("./controllers/services");
+const controllerPayment = require("./controllers/payments");
+const controllerProfessions = require("./controllers/professions");
 const controllerChat = require("./controllers/chat");
-const controllerMessages = require("./controllers/messages")
-const controllerNotifications = require('./controllers/notifications')
-const controllerFeedback = require('./controllers/feedback')
+const controllerMessages = require("./controllers/messages");
+const controllerNotifications = require("./controllers/notifications");
+const controllerFeedback = require("./controllers/feedback");
 
 const googleMapsApiTests = require("./services/testGoogleMaps");
-const googleMapsApi = require("./services/googleMaps")
-const mercadoPagoApi = require('./services/testPreference');
-const oneSidedRequest = require('./controllers/oneSidedServiceRequest');
+const googleMapsApi = require("./services/googleMaps");
+const mercadoPagoApi = require("./services/testPreference");
+const oneSidedRequest = require("./controllers/oneSidedServiceRequest");
 
 //rotas públicas
 routes.post("/sessions", controllerSessions.store);
-routes.post("/clients", multerValidator, middlewareClients.create, uploadFirebase, controllerClients.store);
-routes.post("/freelancers", multerValidator, middlewareFreelancers.create, uploadFirebase, controllerFreelancers.store);
-routes.get("/search", controllerSearching.find)
-
+routes.post(
+  "/clients",
+  multerValidator,
+  middlewareClients.create,
+  uploadFirebase,
+  controllerClients.store
+);
+//rota de profissões
+routes.get("/professions", controllerProfessions.index);
+routes.get("/professions/:id", controllerProfessions.find);
+routes.post(
+  "/freelancers",
+  multerValidator,
+  middlewareFreelancers.create,
+  uploadFirebase,
+  controllerFreelancers.store
+);
+routes.get("/search", controllerSearching.find);
 
 //middleware que verifica o token
 routes.use(authMiddleware);
@@ -44,20 +58,29 @@ routes.get("/feed", controllerFeed.index);
 
 //rota de clientes
 routes.get("/clients", controllerClients.index);
-routes.get("/clients/:id", controllerClients.find)
+routes.get("/clients/:id", controllerClients.find);
 routes.put("/clients", middlewareClients.update, controllerClients.update);
 routes.delete("/clients", controllerClients.delete);
 
 //rota de freelancers
 routes.get("/freelancers", controllerFreelancers.index);
-routes.get("/freelancers/:id", controllerFreelancers.find)
-routes.put("/freelancers", middlewareFreelancers.update, controllerFreelancers.update);
+routes.get("/freelancers/:id", controllerFreelancers.find);
+routes.put(
+  "/freelancers",
+  middlewareFreelancers.update,
+  controllerFreelancers.update
+);
 routes.delete("/freelancers", controllerFreelancers.delete);
-
 
 //rota de postagem
 routes.get("/posts", controllerPosts.index);
-routes.post("/posts", multerValidator, middlewarePosts.create, uploadFirebase, controllerPosts.store);
+routes.post(
+  "/posts",
+  multerValidator,
+  middlewarePosts.create,
+  uploadFirebase,
+  controllerPosts.store
+);
 routes.put("/posts/:id", middlewarePosts.update, controllerPosts.update);
 routes.delete("/posts/:id", controllerPosts.delete);
 
@@ -66,40 +89,45 @@ routes.get("/services", controllerServices.index);
 routes.post("/post/:idPost/service", controllerServices.store);
 
 //TODO: cliente dono da postagem e dono do token
-routes.post("/post/:idPost/freelancer/:idFreelancer/service", oneSidedRequest.create);
+routes.post(
+  "/post/:idPost/freelancer/:idFreelancer/service",
+  oneSidedRequest.create
+);
 
 routes.delete("/post/:idPost/service/:id", controllerServices.delete);
 
 //setar preço do serviço (só para o freelancer)
-routes.put("/post/:idPost/service/:id", controllerServices.update)
+routes.put("/post/:idPost/service/:id", controllerServices.update);
 
 //rota de pagamento (só para o cliente)
-routes.put("/payment/post/:idPost/service/:id", middlewareServices.create, controllerPayment.store);
+routes.put(
+  "/payment/post/:idPost/service/:id",
+  middlewareServices.create,
+  controllerPayment.store
+);
 
 //rota de avaliação
-routes.put("/feedback/post/:idPost/service/:id", controllerFeedback.update)
+routes.put("/feedback/post/:idPost/service/:id", controllerFeedback.update);
 
-//rota teste de preferencia 
+//rota teste de preferencia
 routes.post("/create_preference", mercadoPagoApi.createPreference);
-
-//rota de profissões
-routes.get("/professions", controllerProfessions.index)
-routes.get("/professions/:id", controllerProfessions.find)
 
 //rota para teste do Google Maps
 routes.post("/googlemaps/geolocation", googleMapsApiTests.geoLocation);
 routes.post("/googlemaps/geocoding", googleMapsApiTests.geoCoding);
 
 routes.get("/getNearFreelancers", googleMapsApi.getFreelancersByLocation);
+routes.get("/getNearFreelancers/profession/:id", googleMapsApi.getFreelancersByLocation);
 
 //rotas dos chats
 routes.get("/chats", controllerChat.index);
-routes.post("/createChat/service/:id", controllerChat.store)
+routes.get("/chats/:id", controllerChat.find);
+routes.post("/createChat/service/:id", controllerChat.store);
 
 //rotas das mensagens
 routes.get("/chat/:id/messages", controllerMessages.index);
-routes.post("/service/:idService/chat/:id/message", controllerMessages.store)
+routes.post("/service/:idService/chat/:id/message", controllerMessages.store);
 
-routes.get("/notifications", controllerNotifications.index)
+routes.get("/notifications", controllerNotifications.index);
 
 module.exports = routes;
