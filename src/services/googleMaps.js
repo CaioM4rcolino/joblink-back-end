@@ -79,7 +79,7 @@ async function getFreelancersByLocation(req, res) {
         
             const finalAddress = formatted_address.replace(", Brazil", "")
 
-            if(proximityCalc < 5000){
+            if(proximityCalc < 2000){
                 return finalAddress
             }
         })
