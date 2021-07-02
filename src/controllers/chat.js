@@ -26,7 +26,7 @@ module.exports = {
             },
             {
               association: "Post",
-              attributes: ["id", "title", "description"],
+              attributes: ["id", "title", "description", "is_announcement"],
             },
           ],
         },
@@ -39,7 +39,7 @@ module.exports = {
           include: [
             {
               association: "Post",
-              attributes: ["id", "title", "description"],
+              attributes: ["id", "title", "description", "is_announcement"],
               where: {
                 user_id: idUser,
               },
