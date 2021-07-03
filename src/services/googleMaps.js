@@ -1,7 +1,7 @@
 const { Client } = require('@googlemaps/google-maps-services-js');
 const client = new Client({});
 const CONFIG = require("../config/maps-test-credentials.js");
-const { getPayload, validateModel, haversine} = require('../utils');
+const { getPayload, validateModel, haversine, levenshteinDistance} = require('../utils');
 const User = require('../models/User');
 
 async function getFreelancersByLocation(req, res) {
@@ -22,6 +22,9 @@ async function getFreelancersByLocation(req, res) {
                 key: CONFIG.access_key
             }
         })
+
+        const locationUser = geocode.data.results[0].geometry.location
+
 
         //varredura dos endereços de todos os freelancers do banco
         let allUsers;
@@ -55,7 +58,6 @@ async function getFreelancersByLocation(req, res) {
             })
         }
      
-
         //geocodificação do endereço de todos os freelancers do banco
         const promises = allUsers.map(async (u) => {
             return await client.geocode({
@@ -71,33 +73,48 @@ async function getFreelancersByLocation(req, res) {
 
         //varrer o array com todos os registros geocodificados, pegar as coordenadas de cada um e colocar na fórmula de haversine
         const nearAddress = response.map(r => {
-            const locationUser = geocode.data.results[0].geometry.location
-            const locationFreelancer = r.data.results[0].geometry.location;
-            const proximityCalc = haversine(locationUser, locationFreelancer)
 
+            const locationFreelancer = r.data.results[0].geometry.location;
             const formatted_address = r.data.results[0].formatted_address
-        
             const finalAddress = formatted_address.replace(", Brazil", "")
 
-            if(proximityCalc < 2000){
+            const proximityCalc = haversine(locationUser, locationFreelancer)
+            if(proximityCalc < 3000){
                 return finalAddress
+
+            }
+            else{
+                return "[Too far]"
             }
         })
 
-            const findNearUser = allUsers.filter(u => nearAddress.find(nA => nA === u.address));
-            res.status(200).send(findNearUser)
-    
+        // const all_addresses = allUsers.map(u => u.address);
 
-        // const placesNearby = await client.placesNearby({
-        //     params: {
-        //         location: locationObject,
-        //         radius: 1500,
-        //         type: "",
-        //         key: CONFIG.access_key
-        //     }
+        // return console.log({
+        //     todos: all_addresses,
+        //     pertos: nearAddress
         // })
 
+        // const cobaia1 = 'R. Potirendaba, 512 - Parque Viana, Barueri - SP, 06449-380';
+        // const cobaia2 = 'R. Potirendaba, 512 - Parque Viana, Barueri - SP, 06449-380'
 
+        // const test = levenshteinDistance(cobaia1, cobaia2)
+        // return console.log(test)
+
+        //O algoritmo levensthein é necessário pois, no processo de geocodificação, o google maps formata os endereços mapeados no banco, então quando os endereços próximos são encontrados, eles são retornados de forma diferente da do banco de dados; Usar a variável response também não resolve pois ela retorna apenas os endereços, não os dados de usuário.
+
+        var nearFreelancers = [];
+        allUsers.forEach(u => {
+            nearAddress.map(n => {
+                const aux = levenshteinDistance(u.address, n)
+                if(aux < 4){
+                    nearFreelancers.push(u);
+                }
+            })
+        });
+
+        res.status(200).send(nearFreelancers)
+        
     } catch (error) {
         console.log(error)
         res.status(500).send(error)
