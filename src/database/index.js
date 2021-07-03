@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const Sequelize = require("sequelize");
 const dbConfig = require('../config/database');
 
@@ -12,7 +14,9 @@ const BalanceRegister = require("../models/BalanceRegister")
 const Chat = require("../models/Chat")
 const Message = require("../models/Message")
 
+
 const connection = new Sequelize(dbConfig);
+
 
 User.init(connection)
 Client.init(connection);
