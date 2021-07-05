@@ -1,160 +1,246 @@
-var mercadopago = require('mercadopago');
-const config = require("../config/mp-test-credentials.js");
-const User = require("../models/User");
 const Service = require("../models/Service");
-const {getPayload} = require("../utils");
-const Post = require('../models/Post');
-const BalanceRegister = require("../models/BalanceRegister");
-
+const Post = require("../models/Post");
+const User = require("../models/User");
+const {validateModel, getPayload} = require("../utils");
+const { Op } = require("sequelize");
 
 module.exports = {
-    async store(req, res){
+    
+    async index(req, res){
+        try {
 
-        mercadopago.configure({
-            access_token: config.access_token
-        });
+            const queryServices = await Service.findAll({
+                include:[
+                    {
+                        association: "User",
+                        attributes: ["id", "name"],
+                        
+                    },
+                    {
+                        association: "Freelancer",
+                        attributes: ["id", "name"],
+                        
+                    },
+                    {
+                        association: "Post",
+                        attributes: ["id", "title", "description"],
+                        include:{
+                            association: "User",
+                            attributes: ["id", "name"]
+                        }
+                    }
+                    
+                ],
+                
+            })
+
+            if(queryServices.length != 0)
+                res.status(200).send(queryServices)
+            else
+                res.status(404).send({No_results: "0 serviços encontrados."})
+            
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
+    },
+    async find(req, res){
+        try {
+            
+        } catch (error) {
+            
+        }
+    },
+    async store(req, res){
 
         const payload = getPayload(req)
         const payloadKeys = Object.keys(payload);
 
-        const idService = req.params.id;
         const idPost = req.params.idPost;
         const idUser = Object.values(payload)[0];
 
-        const{payment_methods} = req.body;
+        try {
+
+            const post = await validateModel(res, idPost, Post, "Postagem")
+
+            if(payloadKeys[0] == "clientId"){
+                //significa que o token é de um cliente
+
+                if(post.is_announcement == true || post.is_announcement == 1){
+                    //significa que há um freelancer anunciando serviço
+
+                    const queryServices = await Service.findAll({where:{
+                        id_post: idPost,
+                    }})
+
+                    if(queryServices.length != 0){
+                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
+                    }
+
+                    const service = await Service.create({
+                        id_user: idUser,
+                        id_post: idPost,
+                        is_accepted: false,
+                        id_freelancer: null,
+                        is_from_client: true,
+                        is_accepted: false,
+                        progress: 1,
+                        
+                    })
+
+                    return res.status(201).send(service);
+    
+                }
+                else{
+                    return res.status(401).send({Unauthorized: "Você não pode prestar serviços."});
+                }
+
+            }
+            else if(payloadKeys[0] == "freelancerId"){
+                //significa que o token de um freelancer
+
+                if(post.is_announcement == false || post.is_announcement == 0){
+                    //significa que há um cliente pedindo serviços
+
+                    const queryServices = await Service.findAll({where:{
+                        id_post: idPost,
+                    }})
+
+                    if(queryServices.length != 0){
+                        return res.status(401).send({Unauthorized: "Este serviço já está registrado."});
+                    }
+                
+                    const service = await Service.create({
+                        id_user: idUser,
+                        id_post: idPost,
+                        is_accepted: false,
+                        id_freelancer: null,
+                        is_from_client: false,
+                        is_accepted: false,
+                        progress: 1,
+                    })
+
+                    return res.status(201).send(service);
+    
+                }
+                else{
+
+                    //freelancer atuando como cliente
+
+                    const service = await Service.create({
+                        id_user: idUser,
+                        id_post: idPost,
+                        is_accepted: false,
+                        id_freelancer: null,
+                        is_from_client: true,
+                        is_accepted: false,
+                        progress: 1,
+                    })
+
+                    return res.status(201).send(service);
+
+                }
+
+            }
+  
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
+    },
+    async update(req, res){
+
+        const payload = getPayload(req)
+
+        const {service_cost} = req.body;
+
+        const idPost = req.params.idPost;
+        const idService = req.params.id;
+        const idUser = Object.values(payload)[0];
 
         try {
+
+            const updateServiceCost = async (service, service_cost, idService, idPost) => {
+
+                const updateService = await service.update({
+                    service_cost: service_cost
+                },
+                {
+                    where:{
+                        id: idService,
+                        id_post: idPost
+                    }
+                })
+
+                return res.status(200).send(updateService)
+            }
 
             const service = await Service.findOne({
                 where: {
                     id: idService,
-                    id_post: idPost,
+                    id_post: idPost
                 }
             })
+            const post = await validateModel(res, idPost, Post, "Postagem");
+            const user = await User.findByPk(idUser)
 
-            const user = await User.findByPk(idUser);
 
-            const post = await Post.findByPk(idPost, {
-                include: {
-                    association: "Categories",
-                    attributes: ["id", "name"]
-                }
-            });
+            if(service == null || service == undefined){
+                return res.status(404).send({Error: "Serviço não encontrado."})
+            }
 
-            const categories = post.Categories.map(c => c.dataValues.name).join();
-
-            //   for (let assoc of Object.keys(Post.associations)) {
-            //     for (let accessor of Object.keys(Post.associations[assoc].accessors)) {
-            //         console.log(Post.name + '.' + Post.associations[assoc].accessors[accessor] + '()');
-            //     }
+            // if(service.service_cost != null || service.service_cost != ""){
+            //     return res.status(402).send({Error: "Você já determinou o preço do serviço."})
             // }
 
-            if(service.length == 0){
-                return res.status(401).send({Error: "Serviço não encontrado."})
+            if(user.is_freelancer == false){
+                return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
             }
-
-            if(user.is_freelancer == true){
-                return res.status(401).send({Error: "Você não pode efetuar este pagamento."})
-            }
-            else if(user.id != service.id_user && user.id != post.user_id){
-                return res.status(401).send({Error: "Você não pode efetuar este pagamento."})
-            }
-            
-            const user_name = user.name.split(" ")[0]
-            const user_surname = user.name.split(" ")[1]
-
-            let user_phone_number = " ";
-            let user_phone_area_code = " ";
-
-            if(user.phone_number != null){
-                user_phone_number = user.phone_number.substring(2, 11);
-                user_phone_area_code = user.phone_number.substring(0, 2);
-            }
-         
-          
-            
-            //resgatar o número da rua em um endereço variável
-            // var regex = /\d+/;
-            // const user_address = user.address;
-            // var string_address = regex.exec(user_address);
-
-            const apiRequest = {
-                payer:{
-                    name: user_name,
-                    surname: user_surname,
-                    email: user.email,
-                    identification: {
-                        number: user.cpf
-                    },
-                    phone:{
-                        area_code: user_phone_area_code,
-                        number: Number(user_phone_number) 
-                    },
-                    address:{
-                        street_name: user.address,
-                    }
-                },
-                items:[
-                    {
-                        title: categories,
-                        quantity: 1,
-                        unit_price: Number(service.service_cost)
-                    }
-                ],
-                payment_methods
-            }
-
-            await mercadopago.createPreference(apiRequest)
-
-            const preference = await mercadopago.preferences.create(apiRequest)
-            
-            const balanceCalc = service.service_cost - (service.service_cost * 0.1);
-
-            let freelancer;
-            if(service.is_from_client == 1){
-                freelancer = post.user_id
+            else if(user.id != service.id_user && user.id != post.user_id && service.id_freelancer != user.id){
+                return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
             }
             else{
-                freelancer = service.id_user;
+                updateServiceCost(service, service_cost, idService, idPost);
             }
             
-            const balanceRegister = await BalanceRegister.findOne({
-                where:{
-                    id_service: idService
-                }
-            })
-           
-            if(balanceRegister != null){
-                await balanceRegister.update({
-                    value: balanceCalc,
-                    status_flow: "Cash",
-                    id_freelancer: freelancer,
-                    where:{
-                        id_service: idService
-                    }
-                })
-            }
-            else{
-                await BalanceRegister.create({
-                    value: balanceCalc,
-                    status_flow: "Cash",
-                    id_freelancer: freelancer,
-                    id_service: idService
-                })
-            }
-           
-
-            const updateService = await service.update({
-                progress: 2
-            })
-            res.status(200).send({
-                updateService,
-                preference
-            })
-    
         } catch (error) {
-            res.status(500).send(error)
             console.log(error)
+            res.status(500).send(error)
         }
-    }
+  
+    },
+    async delete(req, res){
+
+        const payload = getPayload(req)
+    
+        const idUser = Object.values(payload)[0];
+        const idPost = req.params.idPost;
+        const idService = req.params.id;
+     
+
+        try {
+
+            const service = await validateModel(res, idService, Service, "Serviço")
+            const post = await validateModel(res, idPost, Post, "Postagem")
+
+            if(service.id_user == idUser || post.user_id == idUser){
+                if(service.id_post == post.id){
+                    await Service.destroy({where:{id: idService}})
+                    return res.status(200).send({Success: "Serviço deletado com sucesso."})
+                }
+                else{
+                    return res.status(404).send({Not_found: "Serviço ou postagem inválidos."})
+                }
+
+            }
+            else{
+                return res.status(401).send({Unauthorized: "Você não pode deletar este serviço."})
+            }
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).send(error)
+        }
+    },
+
 }
