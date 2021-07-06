@@ -27,7 +27,7 @@
   },
   "devDependencies": {},
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "cross-env NODE_ENV=dev nodemon src/server.js",
     "start": "node src/server.js",
     "pretest": "cross-env NODE_ENV=test npx sequelize db:migrate && cross-env NODE_ENV=test npx sequelize db:seed:all",
     "test": "jest",
