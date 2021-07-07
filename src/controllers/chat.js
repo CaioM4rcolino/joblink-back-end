@@ -22,11 +22,16 @@ module.exports = {
           include: [
             {
               association: "User",
-              attributes: ["id", "name"],
+              attributes: ["id", "name", "image"],
             },
             {
               association: "Post",
               attributes: ["id", "title", "description", "is_announcement"],
+
+              include: {
+                association: "User",
+                attributes: ["id", "name", "image"],
+              },
             },
           ],
         },
@@ -45,12 +50,12 @@ module.exports = {
               },
               include: {
                 association: "User",
-                attributes: ["id", "name"],
+                attributes: ["id", "name", "image"],
               },
             },
             {
               association: "User",
-              attributes: ["id", "name"],
+              attributes: ["id", "name", "image"],
             },
           ],
         },
@@ -95,14 +100,14 @@ module.exports = {
           include: [
             {
               association: "User",
-              attributes: ["id", "name"],
+              attributes: ["id", "name", "image"],
             },
             {
               association: "Post",
               attributes: ["id", "title", "description", "is_announcement"],
               include: {
                 association: "User",
-                attributes: ["id", "name"],
+                attributes: ["id", "name", "image"],
               },
             },
           ],

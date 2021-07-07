@@ -46,6 +46,7 @@ module.exports = {
               years_experience: freelancer.years_experience,
               history: freelancer.history,
               rating: freelancer.rating,
+              image: freelancer.image,
             },
 
             token,
@@ -61,6 +62,7 @@ module.exports = {
             email: client.email,
             birth_date: client.birth_date,
             cpf: client.cpf,
+            image: client.image,
           },
 
           token,

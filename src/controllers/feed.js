@@ -1,32 +1,27 @@
-const Post = require("../models/Post")
+const Post = require("../models/Post");
 
 module.exports = {
-    async index(req, res){
-        try {
+  async index(req, res) {
+    try {
+      const feed = await Post.findAll({
+        include: [
+          {
+            association: "User",
+            attributes: ["id", "name", "is_freelancer", "image"],
+          },
 
-            const feed = await Post.findAll({
-                include:[
+          {
+            association: "Categories",
+            through: { attributes: [] },
+            attributes: ["name"],
+          },
+        ],
+      });
 
-                    {
-                        association: "User",
-                        attributes: ["id", "name", "is_freelancer"]
-                    },
-
-                    {
-                        association: "Categories",
-                        through: {attributes: []},
-                        attributes: ["name"]
-
-                    }
-
-                ]
-            })
-
-            res.status(200).send(feed);
-            
-        } catch (error) {
-            console.log(error)
-            res.status(500).send(error)
-        }
+      res.status(200).send(feed);
+    } catch (error) {
+      console.log(error);
+      res.status(500).send(error);
     }
-}
+  },
+};
