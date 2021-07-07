@@ -196,7 +196,7 @@ module.exports = {
             if(user.is_freelancer == false){
                 return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
             }
-            else if(user.id != service.id_user && user.id != post.user_id || service.id_freelancer != user.id){
+            else if(user.id != service.id_user && user.id != post.user_id && service.id_freelancer != user.id){
                 return res.status(401).send({Unauthorized: "Você não pode determinar o preço deste serviço."})
             }
             else{
