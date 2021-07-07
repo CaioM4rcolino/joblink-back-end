@@ -41,6 +41,9 @@ module.exports = {
                 }
             });
 
+            if(post == null || post == undefined){
+                res.status(404).send({Error: "Postagem inválida."})
+            }
             const categories = post.Categories.map(c => c.dataValues.name).join();
 
             //   for (let assoc of Object.keys(Post.associations)) {
