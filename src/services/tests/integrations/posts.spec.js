@@ -6,23 +6,6 @@ const {cpf} = require("cpf-cnpj-validator")
 
 describe("Posts", () => {
 
-    // var token = null;
-
-    // beforeAll(function(done) {
-    //     request(app)
-    //       .post('/sessions')
-    //       .send({
-    //           email: "ricardomedeiros@gmail.com",
-    //           password: "ricardomedeiros"
-    //       })
-    //       .end(function(err, res) {
-    //         token = res.body.token; // Or something
-    //         done();
-    //       });
-    //   });
-
-    
-
     afterAll(()=>{
         connection.close();
     })
@@ -49,8 +32,6 @@ describe("Posts", () => {
             attendance: "false",
             is_announcement: "true"
         })
-
-        //console.log("Ó a categoria:", response.body.post)
 
         expect(response2.body).toHaveProperty("Status")
         expect(response2.body).toHaveProperty("post")

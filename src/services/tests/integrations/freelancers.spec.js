@@ -6,11 +6,6 @@ const {cpf} = require("cpf-cnpj-validator")
 
 describe("Freelancers", () => {
 
-    // beforeEach(async (done) => {
-    //     await truncate(connection.models)
-    //     done();
-    // })
-
     afterAll(()=>{
         connection.close();
     })
@@ -27,8 +22,6 @@ describe("Freelancers", () => {
             cpf: cpf.generate(),
             address: "Avenida Jaraquara, Dakota Brasileira"
         })
-
-        //console.log("Ó o freelancer", response.body.freelancer)
 
         expect(201).toBeTruthy()
         expect(response.body).toHaveProperty("freelancer")

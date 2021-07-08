@@ -103,6 +103,10 @@ module.exports = {
               attributes: ["id", "name", "image"],
             },
             {
+              association: "Freelancer",
+              attributes: ["id", "name"],
+            },
+            {
               association: "Post",
               attributes: ["id", "title", "description", "is_announcement"],
               include: {
